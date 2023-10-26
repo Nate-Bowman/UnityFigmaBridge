@@ -198,7 +198,7 @@ namespace UnityFigmaBridge.Editor.Nodes
                         outlineWidth = Mathf.Clamp(outlineWidth, 0, 0.5f);
                     }
                     var effectMaterialPreset = FontManager.GetEffectMaterialPreset(matchingFontMapping,
-                        hasShadowEffect, shadowColor, shadowDistance, node.strokes.Length>0, outlineColor, outlineWidth);
+                        hasShadowEffect, shadowColor, shadowDistance, shadowBlur, node.strokes.Length>0, outlineColor, outlineWidth);
                     text.fontMaterial = effectMaterialPreset;
 
                     
