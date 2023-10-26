@@ -17,7 +17,7 @@ Properties {
 	_UnderlayOffsetX 	("Border OffsetX", Range(-1,1)) = 0
 	_UnderlayOffsetY 	("Border OffsetY", Range(-1,1)) = 0
 	_UnderlayDilate		("Border Dilate", Range(-1,1)) = 0
-	_UnderlaySoftness 	("Border Softness", Range(0,1)) = 0
+	_UnderlaySoftness 	("Border Softness", Range(0,10)) = 0
 
 	_WeightNormal		("Weight Normal", float) = 0
 	_WeightBold			("Weight Bold", float) = .5
