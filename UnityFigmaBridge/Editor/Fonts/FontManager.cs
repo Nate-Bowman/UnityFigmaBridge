@@ -34,6 +34,7 @@ namespace UnityFigmaBridge.Editor.Fonts
         public bool ShadowEnabled;
         public Color ShadowColor;
         public Vector2 ShadowDistance;
+        public float ShadowBlurRadius;
         
         public Material MaterialPreset;
        
@@ -157,7 +158,7 @@ namespace UnityFigmaBridge.Editor.Fonts
         }
         
         public static Material GetEffectMaterialPreset(FigmaFontMapEntry fontMapEntry, bool shadow, Color shadowColor,
-            Vector2 shadowDistance, bool outline,
+            Vector2 shadowDistance, float shadowBlurRadius, bool outline,
             Color outlineColor, float outlineThickness)
         {
             // Do we have a matching material?
@@ -170,6 +171,7 @@ namespace UnityFigmaBridge.Editor.Fonts
                 if (materialPreset.ShadowEnabled != shadow) isMatch = false;
                 if (shadow && materialPreset.ShadowColor!=shadowColor) isMatch = false;
                 if (shadow && materialPreset.ShadowDistance!=shadowDistance) isMatch = false;
+                if (shadow && materialPreset.ShadowBlurRadius!=shadowBlurRadius) isMatch = false;
                 
                 if (materialPreset.OutlineEnabled != outline) isMatch = false;
                 if (outline && materialPreset.OutlineColor != outlineColor) isMatch = false;
@@ -189,9 +191,10 @@ namespace UnityFigmaBridge.Editor.Fonts
             
             if (shadow)
             {
-                newMaterialPreset.SetFloat("_UnderlayOffsetX",0);
-                newMaterialPreset.SetFloat("_UnderlayOffsetY",-0.6f);
+                newMaterialPreset.SetFloat("_UnderlayOffsetX", shadowDistance.x);
+                newMaterialPreset.SetFloat("_UnderlayOffsetY", shadowDistance.y);
                 newMaterialPreset.SetColor("_UnderlayColor",shadowColor);
+                newMaterialPreset.SetFloat("_UnderlaySoftness", shadowBlurRadius);
             }
             
             newMaterialPreset.SetKeyword(new LocalKeyword(newMaterialPreset.shader,"OUTLINE_ON"),outline);
@@ -212,6 +215,7 @@ namespace UnityFigmaBridge.Editor.Fonts
                 ShadowEnabled=shadow,
                 ShadowColor = shadowColor,
                 ShadowDistance = shadowDistance,
+                ShadowBlurRadius = shadowBlurRadius,
                 OutlineEnabled = outline,
                 OutlineColor = outlineColor,
                 OutlineThickness = outlineThickness,

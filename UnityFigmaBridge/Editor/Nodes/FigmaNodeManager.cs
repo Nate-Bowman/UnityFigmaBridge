@@ -184,6 +184,8 @@ namespace UnityFigmaBridge.Editor.Nodes
                         ? FigmaDataUtils.ToUnityColor(shadowEffect.color) : UnityEngine.Color.white;
                     var shadowDistance = shadowEffect != null
                         ? new Vector2(shadowEffect.offset.x, -shadowEffect.offset.y) : Vector2.zero;
+                    var shadowBlur = shadowEffect != null ? 
+                        Mathf.Clamp(shadowEffect.radius, 0f, 20f) / 20f : 0;
 
                     var outlineColor = node.strokes.Length > 0
                         ? FigmaDataUtils.GetUnityFillColor(node.strokes[0]) : UnityEngine.Color.white;
