@@ -1,10 +1,9 @@
 {
-  "name": "com.simonoliver.unityfigma",
+  "name": "com.ilygos.unityfigma",
   "displayName": "Unity Figma Bridge",
-  "description": "Tool to build Figma documents and Assets as native Unity UI",
+  "description": "Tool to build Figma documents and Assets as native Unity UI -- Forked from Simon Olivier's Unity Figma Bridge",
   "author": {
-    "name": "Simon Oliver",
-    "url": "https://www.simonoliver.com"
+    "name": "Simon Oliver - Enhanced by Ilygos"
   },
   "keywords": [
     "unity",

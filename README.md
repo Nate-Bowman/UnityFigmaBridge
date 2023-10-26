@@ -14,9 +14,7 @@ connect a Figma document to your Unity project and import all of your assets as 
 It's great for game jamming, quick prototyping and easily bringing your Figma designs into Unity. Tested on Unity
 2021.3.X (other versions untested as yet)
 
-**Warning** This is a very early release, so there's a lot that is missing, and probably a lot of bugs - feel free to
-send over any PRs or drop me a message on 🐤[Twitter](https://twitter.com/simonoliveruk) or
-🐘[Mastodon](https://mastodon.gamedev.place/@simonoliver).
+**Warning** This is a very early release, so there's a lot that is missing, and probably a lot of bugs.
 
 Please note - currently only supports **Unity 2021.3** and later!
 
@@ -39,7 +37,7 @@ Please note - currently only supports **Unity 2021.3** and later!
 
 * Open the Package Manager window (Window → Package Manager) and and then select the Add Package icon in the top left of
   the window to add a git package.
-* Enter ```https://github.com/simonoliver/UnityFigmaBridge.git```
+* Enter ```https://github.com/Ilygos/UnityFigmaBridge.git```
 * Open Project Settings (Edit → Project Settings) and click "Create" to create a new settings asset
 * Paste in the URL of your Figma Document (eg ```https://www.figma.com/file/..../...```)
 * Get a [Figma Personal Access Token from your user profile page](https://www.figma.com/developers/api#authentication),
