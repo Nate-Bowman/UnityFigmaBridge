@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -221,9 +222,16 @@ namespace UnityFigmaBridge.Editor.PrototypeFlow
                 string prefabAssetPath = AssetDatabase.GetAssetPath(sourcePrefab);
                 GameObject instantiatedPrefab = PrefabUtility.LoadPrefabContents(prefabAssetPath);
                 BindBehaviourToNodeAndChildren(instantiatedPrefab,figmaImportProcessData);
-               
+
                 // Write prefab with changes
-                PrefabUtility.SaveAsPrefabAsset(instantiatedPrefab, prefabAssetPath);
+                //if (File.Exists(prefabAssetPath) && figmaImportProcessData.Settings.UpdateExistingPrefab)
+                //{
+                //    PrefabUtility.ApplyPrefabInstance(instantiatedPrefab, InteractionMode.AutomatedAction);
+                //}
+                //else
+                {
+                    PrefabUtility.SaveAsPrefabAsset(instantiatedPrefab, prefabAssetPath);
+                }
                 PrefabUtility.UnloadPrefabContents(instantiatedPrefab);
             }
         }

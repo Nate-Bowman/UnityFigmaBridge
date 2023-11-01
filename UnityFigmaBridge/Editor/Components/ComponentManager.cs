@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -24,17 +25,17 @@ namespace UnityFigmaBridge.Editor.Components
        {
            // Remove from components (nested)
             foreach (var componentPrefab in figmaImportProcessData.ComponentData.AllComponentPrefabs)
-                RemoveTemporaryNodeComponents(componentPrefab);
+                RemoveTemporaryNodeComponents(componentPrefab, figmaImportProcessData.Settings.UpdateExistingPrefab);
             
             // Remove from screens
             foreach (var framePrefab in figmaImportProcessData.ScreenPrefabs.Where(framePrefab => framePrefab!=null))
             {
-                RemoveTemporaryNodeComponents(framePrefab);
+                RemoveTemporaryNodeComponents(framePrefab, figmaImportProcessData.Settings.UpdateExistingPrefab);
             }
             // Remove from pages
             foreach (var pagePrefab in figmaImportProcessData.PagePrefabs.Where(pagePrefab => pagePrefab!=null))
             {
-                RemoveTemporaryNodeComponents(pagePrefab);
+                RemoveTemporaryNodeComponents(pagePrefab, figmaImportProcessData.Settings.UpdateExistingPrefab);
             }
        }
 
@@ -42,7 +43,7 @@ namespace UnityFigmaBridge.Editor.Components
         /// Remove all component placeholders from a given prefab object (could be flowScreen or component)
         /// </summary>
         /// <param name="sourcePrefab"></param>
-        private static void RemoveTemporaryNodeComponents(GameObject sourcePrefab)
+        private static void RemoveTemporaryNodeComponents(GameObject sourcePrefab, bool updatePrefab)
         {
             var assetPath = AssetDatabase.GetAssetPath(sourcePrefab);
             var prefabContents = PrefabUtility.LoadPrefabContents(assetPath);
@@ -50,7 +51,15 @@ namespace UnityFigmaBridge.Editor.Components
             foreach (var placeholder in allPlaceholderComponents)
                 Object.DestroyImmediate(placeholder);
             // Save
-            PrefabUtility.SaveAsPrefabAsset(prefabContents, assetPath);
+            //if (File.Exists(assetPath) && updatePrefab)
+            //{
+            //    PrefabUtility.ApplyPrefabInstance(prefabContents, InteractionMode.AutomatedAction);
+            //}
+            //else
+            {
+                PrefabUtility.SaveAsPrefabAsset(prefabContents, assetPath);
+            }
+
             // Unload
             PrefabUtility.UnloadPrefabContents(prefabContents);
         }
@@ -79,7 +88,6 @@ namespace UnityFigmaBridge.Editor.Components
         /// <param name="figmaImportProcessData"></param>
         public static void InstantiateAllComponentPrefabs(FigmaImportProcessData figmaImportProcessData)
         {
-
             // Instantiate components "within" components (nested components)
             InstantiateComponentsInPrefabSet(figmaImportProcessData.ComponentData.AllComponentPrefabs,figmaImportProcessData,"Connecting nested components");
             // Instantiate components within screens
@@ -104,9 +112,7 @@ namespace UnityFigmaBridge.Editor.Components
                 InstantiateComponentPrefabs(targetPrefab, figmaImportProcessData);
             }
         }
-        
-        
-        
+
         /// <summary>
         /// Instantiates prefabs within a given prefab
         /// </summary>
@@ -116,82 +122,58 @@ namespace UnityFigmaBridge.Editor.Components
         {
             var assetPath = AssetDatabase.GetAssetPath(sourcePrefab);
             var prefabContents = PrefabUtility.LoadPrefabContents(assetPath);
-            // Get all placeholders within this prefab - these will be replaced
-            var allPlaceholderComponents = prefabContents.GetComponentsInChildren<FigmaComponentNodeMarker>();
-            
-            // Filter out any that are replacements in prefab instances (we want to skip these)
-            var targetPlaceHolderComponents = new List<FigmaComponentNodeMarker>();
-            foreach (var t in allPlaceholderComponents)
-            {
-                var prefabInstanceRoot=PrefabUtility.GetNearestPrefabInstanceRoot(t.gameObject);
-                if (prefabInstanceRoot==null) targetPlaceHolderComponents.Add(t);
-                else
-                {
-                    // Debug.Log($"Prefab instance root found for object {t.gameObject.name}, skipping");
-                }
-            }
 
+            var targetPlaceHolderComponents = prefabContents.GetComponentsInChildren<FigmaComponentNodeMarker>()
+                .Where(t => PrefabUtility.GetNearestPrefabInstanceRoot(t.gameObject) == null)
+                .ToList();
 
-            // Track a list of placed and modified components, to allow effective saving
             var modifiedPrefabInstances = new List<GameObject>();
+
             foreach (var placeholder in targetPlaceHolderComponents)
             {
                 var sourceComponentPrefab = figmaImportProcessData.ComponentData.GetComponentPrefab(placeholder.ComponentId);
 
                 if (sourceComponentPrefab == null) continue;
-                
-                // Instantiate
-                var addedReplacementComponent = (GameObject)PrefabUtility.InstantiatePrefab(sourceComponentPrefab,placeholder.transform.parent);
-                // Copy transform data
+
+                var addedReplacementComponent = (GameObject)PrefabUtility.InstantiatePrefab(sourceComponentPrefab, placeholder.transform.parent);
                 UnityUiUtils.CloneTransformData(placeholder.transform as RectTransform, addedReplacementComponent.transform as RectTransform);
-                // Copy name
-                addedReplacementComponent.name = placeholder.name; // Copy original name
-                
-                // Change node Id to match instantiated version
+                addedReplacementComponent.name = placeholder.name;
+
                 var figmaNodeComponent = addedReplacementComponent.GetComponent<FigmaNodeObject>();
-                if (figmaNodeComponent == null)
-                {
-                    Debug.LogWarning("No FigmaNodeObject on component prefab");
-                }
-                else
+                if (figmaNodeComponent != null)
                 {
                     figmaNodeComponent.NodeId = placeholder.NodeId;
                 }
-                
-                // Copy transform order
-                addedReplacementComponent.transform.SetSiblingIndex(placeholder.transform.GetSiblingIndex()); // Put at same order
-                // Get the Node data for this component
-                var nodeData = figmaImportProcessData.NodeLookupDictionary[placeholder.NodeId]; 
-                // Get parent node data for the original node
-                var parentNodeData =  figmaImportProcessData.NodeLookupDictionary[placeholder.ParentNodeId];
-                if (nodeData != null)
+
+                addedReplacementComponent.transform.SetSiblingIndex(placeholder.transform.GetSiblingIndex());
+
+                if (figmaImportProcessData.NodeLookupDictionary.TryGetValue(placeholder.NodeId, out var nodeData))
                 {
-                    // Recursively apply all properties for this node object (such as text, image fills etc)
+                    var parentNodeData = figmaImportProcessData.NodeLookupDictionary[placeholder.ParentNodeId];
                     ApplyFigmaProperties(nodeData, addedReplacementComponent, parentNodeData, figmaImportProcessData);
                 }
 
-                // We want to attempt to link this newly placed item to any parent MonoBehaviours that might need it as a field
-                // TODO - Optimise (Right now this is called way more often than needed)
                 var parentMonoBehaviours = placeholder.transform.parent.gameObject.GetComponents<MonoBehaviour>();
                 foreach (var monoBehaviour in parentMonoBehaviours)
                 {
-                    BehaviourBindingManager.BindFieldsForComponent(placeholder.transform.parent.gameObject,
-                        monoBehaviour);
+                    BehaviourBindingManager.BindFieldsForComponent(placeholder.transform.parent.gameObject, monoBehaviour);
                 }
 
-                // Mark as modified for later saving
                 modifiedPrefabInstances.Add(addedReplacementComponent);
-                Object.DestroyImmediate(placeholder.gameObject); // Remove the placeholder
-
+                Object.DestroyImmediate(placeholder.gameObject);
             }
-            // Save prefab and all changes
+
             try
             {
-                // We might have issue with nested elements so need try catch loop
-                // TODO - Check for recurisve nested components
-                PrefabUtility.SaveAsPrefabAsset(prefabContents, assetPath);
-                
-                // Apply changes to the instance as modifications
+                if (File.Exists(assetPath) && figmaImportProcessData.Settings.UpdateExistingPrefab)
+                {
+                    PrefabUtility.ApplyPrefabInstance(prefabContents, InteractionMode.AutomatedAction);
+                }
+                else
+                {
+                    PrefabUtility.SaveAsPrefabAsset(prefabContents, assetPath);
+                }
+
                 foreach (var modifiedPrefabInstance in modifiedPrefabInstances)
                 {
                     PrefabUtility.RecordPrefabInstancePropertyModifications(modifiedPrefabInstance);
@@ -204,6 +186,50 @@ namespace UnityFigmaBridge.Editor.Components
 
             PrefabUtility.UnloadPrefabContents(prefabContents);
         }
+
+        private static void ProcessNestedPrefabs(GameObject parentPrefab, FigmaImportProcessData figmaImportProcessData)
+        {
+            var placeholders = parentPrefab.GetComponentsInChildren<FigmaComponentNodeMarker>();
+            foreach (var placeholder in placeholders)
+            {
+                var sourceComponentPrefab = figmaImportProcessData.ComponentData.GetComponentPrefab(placeholder.ComponentId);
+
+                if (sourceComponentPrefab == null) continue;
+
+                var addedReplacementComponent = (GameObject)PrefabUtility.InstantiatePrefab(sourceComponentPrefab, placeholder.transform.parent);
+                UnityUiUtils.CloneTransformData(placeholder.transform as RectTransform, addedReplacementComponent.transform as RectTransform);
+                addedReplacementComponent.name = placeholder.name;
+
+                var figmaNodeComponent = addedReplacementComponent.GetComponent<FigmaNodeObject>();
+                if (figmaNodeComponent != null)
+                {
+                    figmaNodeComponent.NodeId = placeholder.NodeId;
+                }
+
+                addedReplacementComponent.transform.SetSiblingIndex(placeholder.transform.GetSiblingIndex());
+
+                if (figmaImportProcessData.NodeLookupDictionary.TryGetValue(placeholder.NodeId, out var nodeData))
+                {
+                    var parentNodeData = figmaImportProcessData.NodeLookupDictionary[placeholder.ParentNodeId];
+                    ApplyFigmaProperties(nodeData, addedReplacementComponent, parentNodeData, figmaImportProcessData);
+                }
+
+                var parentMonoBehaviours = placeholder.transform.parent.gameObject.GetComponents<MonoBehaviour>();
+                foreach (var monoBehaviour in parentMonoBehaviours)
+                {
+                    BehaviourBindingManager.BindFieldsForComponent(placeholder.transform.parent.gameObject, monoBehaviour);
+                }
+
+                Object.DestroyImmediate(placeholder.gameObject);
+            }
+
+            // Recursively process nested prefabs
+            foreach (Transform child in parentPrefab.transform)
+            {
+                ProcessNestedPrefabs(child.gameObject, figmaImportProcessData);
+            }
+        }
+
 
         /// <summary>
         /// Recursively apply properties from a node to a given existing GameObject. Used to apply changes to component instances (including nested elements) 

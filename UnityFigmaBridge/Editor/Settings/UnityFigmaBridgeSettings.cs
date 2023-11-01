@@ -40,6 +40,9 @@ namespace UnityFigmaBridge.Editor.Settings
         [Tooltip("If true, download only selected pages and screens")]
         public bool OnlyImportSelectedPages = false;
 
+        [Tooltip("If true, update existing screens prefabs")]
+        public bool UpdateExistingPrefab = false;
+
         [HideInInspector]
         public List<FigmaPageData> PageDataList = new ();
 

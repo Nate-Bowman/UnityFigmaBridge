@@ -109,9 +109,9 @@ namespace UnityFigmaBridge.Editor
                 pageNodeList = pageNodeList.Where(p => enabledPageIdList.Contains(p.id)).ToList();
             }
 
-            await ImportDocument(s_UnityFigmaBridgeSettings.FileId, figmaFile, pageNodeList);
-            
-        }
+            await ImportDocument(s_UnityFigmaBridgeSettings.FileId, figmaFile, pageNodeList, s_UnityFigmaBridgeSettings.UpdateExistingPrefab);
+
+    }
 
         /// <summary>
         /// Check to make sure all requirements are met before syncing
@@ -319,16 +319,16 @@ namespace UnityFigmaBridge.Editor
             return null;
         }
 
-        private static async Task ImportDocument(string fileId, FigmaFile figmaFile, List<Node> downloadPageNodeList)
+        private static async Task ImportDocument(string fileId, FigmaFile figmaFile, List<Node> downloadPageNodeList, bool updatePrefabs)
         {
 
             // Build a list of page IDs to download
             var downloadPageIdList = downloadPageNodeList.Select(p => p.id).ToList();
-            
+
             // Ensure we have all required directories, and remove existing files
             // TODO - Once we move to processing only differences, we won't remove existing files
-            FigmaPaths.CreateRequiredDirectories();
-            
+            FigmaPaths.CreateRequiredDirectories(updatePrefabs);
+
             // Next build a list of all externally referenced components not included in the document (eg
             // from external libraries) and download
             var externalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile);
