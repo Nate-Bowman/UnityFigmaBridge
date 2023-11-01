@@ -279,7 +279,45 @@ namespace UnityFigmaBridge.Editor.Nodes
             
             figmaImportProcessData.ScreenPrefabs.Add(screenPrefab);
         }
-        
+
+        private static void ReplaceChildObjectsWithPrefabsInScreen(RectTransform screenTransform)
+        {
+            for (int i = screenTransform.childCount - 1; i >= 0; --i)
+            {
+                Transform child = screenTransform.GetChild(i);
+
+                // Get the path for the component prefab based on the child's name
+                string prefabPath = FigmaPaths.GetPathForComponentPrefab(child.gameObject.name, 0);
+
+                try
+                {
+                    // Load the prefab
+                    GameObject prefab = PrefabUtility.LoadPrefabContents(prefabPath);
+
+                    if (prefab != null)
+                    {
+                        // Instantiate the prefab as a child of the parent
+                        GameObject instantiatedPrefab = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+
+                        if (instantiatedPrefab != null)
+                        {
+                            instantiatedPrefab.transform.SetParent(child.parent);
+                            GameObject.DestroyImmediate(child.gameObject);
+                        }
+                    }
+
+                    // Unload the prefab contents
+                    PrefabUtility.UnloadPrefabContents(prefab);
+                }
+                catch (Exception e)
+                {
+                    // Handle or log the exception if needed
+                    //　Debug.Log($"Error replacing child object with prefab: {e}");
+                }
+            }
+        }
+
+
         /// <summary>
         /// 
         /// </summary>

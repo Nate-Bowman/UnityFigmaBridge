@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,6 +81,46 @@ namespace UnityFigmaBridge.Editor.Components
             figmaImportProcessData.ComponentData.IncrementComponentNameCount(nodeName,1);
             var componentPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(nodeGameObject, prefabAssetPath, InteractionMode.UserAction);
             figmaImportProcessData.ComponentData.RegisterComponentPrefab(node.id,componentPrefab);
+
+        public static void UpdatePrefabValues(GameObject originalPrefab, GameObject newPrefab)
+        {
+            // Iterate through all components of the source GameObject
+            UnityEngine.Component[] sourceComponents = originalPrefab.GetComponents<UnityEngine.Component>();
+            UnityEngine.Component[] targetComponents = newPrefab.GetComponents<UnityEngine.Component>();
+
+            foreach (UnityEngine.Component sourceComponent in sourceComponents)
+            {
+                foreach (UnityEngine.Component targetComponent in targetComponents)
+                {
+                    // Check if the components have the same type
+                    if (sourceComponent.GetType() == targetComponent.GetType())
+                    {
+                        // Iterate through all fields in the component
+                        FieldInfo[] fields = sourceComponent.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        foreach (FieldInfo field in fields)
+                        {
+                            // Copy the value from the source component's field to the target component's field
+                            field.SetValue(targetComponent, field.GetValue(sourceComponent));
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void AddMissingComponentToPrefab(GameObject originalPrefab, GameObject newPrefab)
+        {
+            // Iterate through all components of the source GameObject
+            List<Type> sourceComponentsType = originalPrefab.GetComponents<UnityEngine.Component>().Select(x => x.GetType()).ToList();
+            UnityEngine.Component[] targetComponents = newPrefab.GetComponents<UnityEngine.Component>();
+
+            foreach (UnityEngine.Component targetComponent in targetComponents)
+            {
+                if(!sourceComponentsType.Contains(targetComponent.GetType()))
+                {
+                    var component = originalPrefab.AddComponent(targetComponent.GetType());
+                }
+            }
+            
         }
         
         /// <summary>
