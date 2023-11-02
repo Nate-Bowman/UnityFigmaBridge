@@ -181,6 +181,14 @@ Some special case components are automatically added:
 If a Button is added, it will look for a child node called "selected". If this is found, it will use this for rollover
 state.
 
+## Prefab Preservation
+![Prefab Preservation](/Docs/PrefabPreserv.png)
+
+* If you check the Update Existing Prefab option in settings, it will conserve the elements added to prefabs outside of Figma
+(e.g. Monobehaviours, GameObjects, ...)
+
+* This is still in development so expect issues with this feature
+
 ## Transitions
 
 The FigmaScreenController can have a TransitionEffect which implements transitions in and out animations. By default a
