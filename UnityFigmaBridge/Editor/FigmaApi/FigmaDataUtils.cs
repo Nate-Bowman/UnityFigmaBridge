@@ -129,10 +129,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         public static Node GetFigmaNodeWithId(FigmaFile file, string nodeId)
         {
             return GetFigmaNodeInChildren(file.document,nodeId);
-        }
-
-
-      
+        }     
 
         /// <summary>
         /// Find a specific figmaNode within figma figmaNode tree (recursive)
