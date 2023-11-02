@@ -579,6 +579,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                 if (!hasChild)
                 {
                     newChild = GameObject.Instantiate(originalChild, newPrefab.transform);
+                    newChild.name = originalChild.name;
                 }
             }
 

@@ -23,7 +23,7 @@ namespace UnityFigmaBridge.Editor.Utils
         
         public static void CloneTransformData(RectTransform source, RectTransform destination)
         {
-            destination.parent = source.parent;
+            destination.SetParent(source.parent);
             destination.anchorMin = source.anchorMin;
             destination.anchorMax = source.anchorMax;
             destination.anchoredPosition = source.anchoredPosition;
