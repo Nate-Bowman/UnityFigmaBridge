@@ -11,6 +11,12 @@ namespace UnityFigmaBridge.Editor.Utils
         ///  Root folder for assets
         /// </summary>
         public static string FigmaAssetsRootFolder = "Assets/Figma";
+        public static string FigmaAssetsBackupFolder = "Assets/Figma/Backup";
+
+        public static string FigmaPagePrefabBackupFolder = $"{FigmaAssetsBackupFolder}/Pages";
+        public static string FigmaScreenPrefabBackupFolder = $"{FigmaAssetsBackupFolder}/Screens";
+        public static string FigmaComponentPrefabBackupFolder = $"{FigmaAssetsBackupFolder}/Components";
+
         /// <summary>
         /// Assert folder to store page prefabs)
         /// </summary>
@@ -63,22 +69,25 @@ namespace UnityFigmaBridge.Editor.Utils
             }
         }
 
-        public static string GetPathForScreenPrefab(Node node, int duplicateCount)
+        public static string GetPathForScreenPrefab(Node node, int duplicateCount, bool backup = false)
         {
-            return $"{FigmaScreenPrefabFolder}/{GetFileNameForNode(node, duplicateCount)}.prefab";
+            string folder = backup ? FigmaScreenPrefabBackupFolder : FigmaScreenPrefabFolder;
+            return $"{folder}/{GetFileNameForNode(node, duplicateCount)}.prefab";
         }
 
-        public static string GetPathForPagePrefab(Node node, int duplicateCount)
+        public static string GetPathForPagePrefab(Node node, int duplicateCount, bool backup = false)
         {
-            return $"{FigmaPagePrefabFolder}/{GetFileNameForNode(node, duplicateCount)}.prefab";
+            string folder = backup ? FigmaPagePrefabBackupFolder : FigmaScreenPrefabFolder;
+            return $"{folder}/{GetFileNameForNode(node, duplicateCount)}.prefab";
         }
 
-        public static string GetPathForComponentPrefab(string nodeName, int duplicateCount)
+        public static string GetPathForComponentPrefab(string nodeName, int duplicateCount, bool backup = false)
         {
             // If name already used, create a unique name
+            string folder = backup ? FigmaComponentPrefabBackupFolder : FigmaComponentPrefabFolder;
             if (duplicateCount > 0) nodeName += $"_{duplicateCount}";
             nodeName = ReplaceUnsafeCharacters(nodeName);
-            return $"{FigmaComponentPrefabFolder}/{nodeName}.prefab";
+            return $"{folder}/{nodeName}.prefab";
         }
 
         public static string GetFileNameForNode(Node node, int duplicateCount)
@@ -167,5 +176,63 @@ namespace UnityFigmaBridge.Editor.Utils
             }
         }
 
+        public static void BackupPrefabs()
+        {
+            //  Create directory for pages if required 
+            if (!Directory.Exists(FigmaPagePrefabBackupFolder))
+            {
+                Directory.CreateDirectory(FigmaPagePrefabBackupFolder);
+            }
+
+            // Copy existing prefabs for pages
+            foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
+            {
+                file.CopyTo(FigmaPagePrefabBackupFolder, true);
+            }
+
+            //  Create directory for pages if required 
+            if (!Directory.Exists(FigmaScreenPrefabBackupFolder))
+            {
+                Directory.CreateDirectory(FigmaScreenPrefabBackupFolder);
+            }
+
+            // Copy existing prefabs for pages
+            foreach (var file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
+            {
+                file.CopyTo(FigmaScreenPrefabBackupFolder, true);
+            }
+
+            //  Create directory for pages if required 
+            if (!Directory.Exists(FigmaComponentPrefabBackupFolder))
+            {
+                Directory.CreateDirectory(FigmaComponentPrefabBackupFolder);
+            }
+
+            // Copy existing prefabs for pages
+            foreach (var file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles())
+            {
+                file.CopyTo(FigmaComponentPrefabBackupFolder, true);
+            }
+
+        }
+
+        public static void DeleteBackup()
+        {
+            //  Create directory for pages if required 
+            if (Directory.Exists(FigmaPagePrefabBackupFolder))
+                Directory.Delete(FigmaPagePrefabBackupFolder, true);
+            
+
+            //  Create directory for pages if required 
+            if (Directory.Exists(FigmaScreenPrefabBackupFolder))
+                Directory.Delete(FigmaScreenPrefabBackupFolder, true);
+            
+
+            //  Create directory for pages if required 
+            if (Directory.Exists(FigmaComponentPrefabBackupFolder))
+                Directory.Delete(FigmaComponentPrefabBackupFolder, true);
+            
+
+        }
     }
 }

@@ -324,7 +324,13 @@ namespace UnityFigmaBridge.Editor
 
             // Build a list of page IDs to download
             var downloadPageIdList = downloadPageNodeList.Select(p => p.id).ToList();
-
+            if (updatePrefabs)
+            {
+                //FigmaPaths.DeleteBackup();
+                // Backup prefabs to apply only the delta to the figma prefab
+                // Improve => To this apply delta between prefabs without having to backup
+                FigmaPaths.BackupPrefabs();
+            }
             // Ensure we have all required directories, and remove existing files
             // TODO - Once we move to processing only differences, we won't remove existing files
             FigmaPaths.CreateRequiredDirectories(updatePrefabs);
@@ -332,28 +338,6 @@ namespace UnityFigmaBridge.Editor
             // Next build a list of all externally referenced components not included in the document (eg
             // from external libraries) and download
             var externalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile);
-            
-            // TODO - Implement external components
-            // This is currently not working as only returns a depth of 1 of returned nodes. Need to get original files too
-            /*
-            FigmaFileNodes activeExternalComponentsData=null;
-            if (externalComponentList.Count > 0)
-            {
-                EditorUtility.DisplayProgressBar(PROGRESS_BOX_TITLE, $"Getting external component data", 0);
-                try
-                {
-                    var figmaTask = FigmaApiUtils.GetFigmaFileNodes(fileId, s_PersonalAccessToken,externalComponentList);
-                    await figmaTask;
-                    activeExternalComponentsData = figmaTask.Result;
-                }
-                catch (Exception e)
-                {
-                    EditorUtility.ClearProgressBar();
-                    ReportError("Error downloading external component Data",e.ToString());
-                    return;
-                }
-            }
-            */
 
             // For any missing component definitions, we are going to find the first instance and switch it to be
             // The source component. This has to be done early to ensure download of server images
