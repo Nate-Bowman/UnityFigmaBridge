@@ -568,6 +568,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                     if (originalChild.name == newChild.name)
                     {
                         hasChild = true;
+                        AddMissingComponentToPrefab(originalChild, newChild);
                         break;
                     }
                     hasChild = false;
