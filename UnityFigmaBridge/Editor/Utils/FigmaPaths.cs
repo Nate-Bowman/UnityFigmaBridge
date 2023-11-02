@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using UnityFigmaBridge.Editor.FigmaApi;
+using UnityFigmaBridge.Editor.Settings;
 
 namespace UnityFigmaBridge.Editor.Utils
 {
@@ -47,6 +48,14 @@ namespace UnityFigmaBridge.Editor.Utils
         /// Asset folder to store Font assets (TTF and generated TMP fonts)
         /// </summary>
         public static string FigmaFontsFolder = $"{FigmaAssetsRootFolder}/Fonts";
+
+        public static void Setup(UnityFigmaBridgeSettings figmaImportProcessDataSettings)
+        {
+            if (!string.IsNullOrEmpty(figmaImportProcessDataSettings.FigmaAssetRootPath))
+            {
+                FigmaAssetsRootFolder = figmaImportProcessDataSettings.FigmaAssetRootPath;
+            }
+        }
 
 
         public static string GetPathForImageFill(string imageId)
