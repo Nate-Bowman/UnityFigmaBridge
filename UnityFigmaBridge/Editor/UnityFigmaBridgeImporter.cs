@@ -109,7 +109,7 @@ namespace UnityFigmaBridge.Editor
                 pageNodeList = pageNodeList.Where(p => enabledPageIdList.Contains(p.id)).ToList();
             }
 
-            await ImportDocument(s_UnityFigmaBridgeSettings.FileId, figmaFile, pageNodeList, s_UnityFigmaBridgeSettings.UpdateExistingPrefab);
+            await ImportDocument(s_UnityFigmaBridgeSettings, figmaFile, pageNodeList);
 
     }
 
@@ -319,12 +319,13 @@ namespace UnityFigmaBridge.Editor
             return null;
         }
 
-        private static async Task ImportDocument(string fileId, FigmaFile figmaFile, List<Node> downloadPageNodeList, bool updatePrefabs)
+        private static async Task ImportDocument(UnityFigmaBridgeSettings settings, FigmaFile figmaFile, List<Node> downloadPageNodeList)
         {
 
             // Build a list of page IDs to download
             var downloadPageIdList = downloadPageNodeList.Select(p => p.id).ToList();
-            if (updatePrefabs)
+            FigmaPaths.Setup(settings);
+            if (settings.UpdateExistingPrefab)
             {
                 //FigmaPaths.DeleteBackup();
                 // Backup prefabs to apply only the delta to the figma prefab
@@ -333,7 +334,7 @@ namespace UnityFigmaBridge.Editor
             }
             // Ensure we have all required directories, and remove existing files
             // TODO - Once we move to processing only differences, we won't remove existing files
-            FigmaPaths.CreateRequiredDirectories(updatePrefabs);
+            FigmaPaths.CreateRequiredDirectories(settings.UpdateExistingPrefab);
 
             // Next build a list of all externally referenced components not included in the document (eg
             // from external libraries) and download
@@ -363,7 +364,7 @@ namespace UnityFigmaBridge.Editor
                     EditorUtility.DisplayProgressBar(PROGRESS_BOX_TITLE, $"Downloading server-rendered image data {i+1}/{batchCount}",(float)i/(float)batchCount);
                     try
                     {
-                        var figmaTask = FigmaApiUtils.GetFigmaServerRenderData(fileId, s_PersonalAccessToken,
+                        var figmaTask = FigmaApiUtils.GetFigmaServerRenderData(settings.FileId, s_PersonalAccessToken,
                             serverNodeCsvList, s_UnityFigmaBridgeSettings.ServerRenderImageScale);
                         await figmaTask;
                         serverRenderData.Add(figmaTask.Result);
@@ -388,7 +389,7 @@ namespace UnityFigmaBridge.Editor
             EditorUtility.DisplayProgressBar(PROGRESS_BOX_TITLE, $"Downloading image fill data", 0);
             try
             {
-                var figmaTask = FigmaApiUtils.GetDocumentImageFillData(fileId, s_PersonalAccessToken);
+                var figmaTask = FigmaApiUtils.GetDocumentImageFillData(settings.FileId, s_PersonalAccessToken);
                 await figmaTask;
                 activeFigmaImageFillData = figmaTask.Result;
             }
@@ -474,7 +475,7 @@ namespace UnityFigmaBridge.Editor
                 if (screenController.TransitionEffect == null)
                 {
                     // Instantiate and apply the default transition effect (loaded from package assets folder)
-                    var defaultTransitionAnimationEffect = AssetDatabase.LoadAssetAtPath("Packages/com.simonoliver.unityfigma/UnityFigmaBridge/Assets/TransitionFadeToBlack.prefab", typeof(GameObject)) as GameObject;
+                    var defaultTransitionAnimationEffect = AssetDatabase.LoadAssetAtPath("Packages/com.ilygos.unityfigma/UnityFigmaBridge/Assets/TransitionFadeToBlack.prefab", typeof(GameObject)) as GameObject;
                     var transitionObject = (GameObject) PrefabUtility.InstantiatePrefab(defaultTransitionAnimationEffect,
                         screenController.transform.transform);
                     screenController.TransitionEffect =

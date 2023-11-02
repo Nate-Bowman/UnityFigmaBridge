@@ -14,11 +14,14 @@ namespace UnityFigmaBridge.Editor.Settings
         
         [Tooltip("Generate logic and linking of screens based on FIGMA's 'Prototype' settings")]
         public bool BuildPrototypeFlow=true;
-        
+
         [Space(10)]
         [Tooltip("Scene used for prototype assets, including canvas")]
         public string RunTimeAssetsScenePath;
-        
+
+        [Tooltip("Setup the root path of Figma assets")]
+        public string FigmaAssetRootPath = "Assets/Figma";
+
         [Tooltip("Enable Auto layout components (Horizontal/Vertical layout) (EXPERIMENTAL)")]
         public bool EnableAutoLayout = false;
         
