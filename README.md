@@ -218,7 +218,7 @@ Big thanks for  making those available online!
 
 * User defined locations for saving assets
 * Image tweaks (Exposure, Contrast)
-* Blur on shadows
+* Blur on shadows (Except on Text)
 * Ellipse sweep angles and fill ratio
 * Most effects (Inner shadow, Layer Blur, Background Blue)
 * Multiple fills on a single object
@@ -232,7 +232,6 @@ Big thanks for  making those available online!
 * Polygon Shapes
 * Boolean operations
 * Line/Arrow
-* Consistent UUIDs
 * Support for "Scale" constraint
 
 ## Feedback, bugs and contributions
