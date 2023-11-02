@@ -8,6 +8,8 @@ using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityFigmaBridge.Editor.FigmaApi;
+using UnityFigmaBridge.Editor.Utils;
 using UnityFigmaBridge.Runtime.UI;
 
 namespace UnityFigmaBridge.Editor.PrototypeFlow
@@ -72,7 +74,7 @@ namespace UnityFigmaBridge.Editor.PrototypeFlow
             return false;
         }
 
-        public static void BindFieldsForComponent(GameObject gameObject, Component component)
+        public static void BindFieldsForComponent(GameObject gameObject, UnityEngine.Component component)
         {
             var componentType = component.GetType();
             
@@ -96,7 +98,7 @@ namespace UnityFigmaBridge.Editor.PrototypeFlow
                     {
                         field.SetValue(component,matchingTransform.gameObject);
                     }
-                    else if (fieldType.IsSubclassOf(typeof(Component)))
+                    else if (fieldType.IsSubclassOf(typeof(UnityEngine.Component)))
                     {
                         // Try and find a matching component
                         var matchingComponent = matchingTransform.gameObject.GetComponent(fieldType);
@@ -222,16 +224,16 @@ namespace UnityFigmaBridge.Editor.PrototypeFlow
                 string prefabAssetPath = AssetDatabase.GetAssetPath(sourcePrefab);
                 GameObject instantiatedPrefab = PrefabUtility.LoadPrefabContents(prefabAssetPath);
                 BindBehaviourToNodeAndChildren(instantiatedPrefab,figmaImportProcessData);
+                string prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(sourcePrefab.name, 0, true);
+                if (figmaImportProcessData.Settings.UpdateExistingPrefab && File.Exists(prefabBackupPath))
+                {
+                    GameObject backup = PrefabUtility.LoadPrefabContents(prefabBackupPath);
+                    FigmaDataUtils.AddMissingComponentToPrefab(backup, instantiatedPrefab);
+                    PrefabUtility.UnloadPrefabContents(backup);
+                }
 
                 // Write prefab with changes
-                //if (File.Exists(prefabAssetPath) && figmaImportProcessData.Settings.UpdateExistingPrefab)
-                //{
-                //    PrefabUtility.ApplyPrefabInstance(instantiatedPrefab, InteractionMode.AutomatedAction);
-                //}
-                //else
-                {
-                    PrefabUtility.SaveAsPrefabAsset(instantiatedPrefab, prefabAssetPath);
-                }
+                PrefabUtility.SaveAsPrefabAsset(instantiatedPrefab, prefabAssetPath);
                 PrefabUtility.UnloadPrefabContents(instantiatedPrefab);
             }
         }

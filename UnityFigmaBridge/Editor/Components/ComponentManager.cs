@@ -48,9 +48,18 @@ namespace UnityFigmaBridge.Editor.Components
         {
             var assetPath = AssetDatabase.GetAssetPath(sourcePrefab);
             var prefabContents = PrefabUtility.LoadPrefabContents(assetPath);
+            var prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(prefabContents.name, 0, true);
+
+            var prefabCopy = File.Exists(prefabBackupPath) ? PrefabUtility.LoadPrefabContents(prefabBackupPath) : null;
+
             var allPlaceholderComponents = prefabContents.GetComponentsInChildren<FigmaNodeObject>();
             foreach (var placeholder in allPlaceholderComponents)
                 Object.DestroyImmediate(placeholder);
+            if (prefabCopy != null)
+            {
+                FigmaDataUtils.AddMissingComponentToPrefab(prefabCopy, prefabContents);
+                PrefabUtility.UnloadPrefabContents(prefabCopy);
+            }
             // Save
             PrefabUtility.SaveAsPrefabAsset(prefabContents, assetPath);
             // Unload
@@ -70,7 +79,14 @@ namespace UnityFigmaBridge.Editor.Components
             var nodeName = parentNode is { type: NodeType.COMPONENT_SET } ? $"{parentNode.name}-{node.name}" : node.name;
             var componentCount = figmaImportProcessData.ComponentData.GetComponentNameCount(nodeName);
             var prefabAssetPath = FigmaPaths.GetPathForComponentPrefab(nodeName, componentCount);
+            var prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(nodeName, componentCount, true);
             figmaImportProcessData.ComponentData.IncrementComponentNameCount(nodeName, 1);
+            if (File.Exists(prefabBackupPath) && figmaImportProcessData.Settings.UpdateExistingPrefab)
+            {
+                var prefabContents = PrefabUtility.LoadPrefabContents(prefabBackupPath);
+                FigmaDataUtils.AddMissingComponentToPrefab(prefabContents, nodeGameObject);
+                PrefabUtility.UnloadPrefabContents(prefabContents);
+            }
             var componentPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(nodeGameObject, prefabAssetPath, InteractionMode.UserAction);
             figmaImportProcessData.ComponentData.RegisterComponentPrefab(node.id, componentPrefab);
         }
@@ -89,32 +105,17 @@ namespace UnityFigmaBridge.Editor.Components
                     if (sourceComponent.GetType() == targetComponent.GetType())
                     {
                         // Iterate through all fields in the component
-                        FieldInfo[] fields = sourceComponent.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        FieldInfo[] fields = targetComponent.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                         foreach (FieldInfo field in fields)
                         {
                             // Copy the value from the source component's field to the target component's field
-                            field.SetValue(targetComponent, field.GetValue(sourceComponent));
+                            field.SetValue(sourceComponent, field.GetValue(targetComponent));
                         }
                     }
                 }
             }
         }
 
-        public static void AddMissingComponentToPrefab(GameObject originalPrefab, GameObject newPrefab)
-        {
-            // Iterate through all components of the source GameObject
-            List<Type> sourceComponentsType = originalPrefab.GetComponents<UnityEngine.Component>().Select(x => x.GetType()).ToList();
-            UnityEngine.Component[] targetComponents = newPrefab.GetComponents<UnityEngine.Component>();
-
-            foreach (UnityEngine.Component targetComponent in targetComponents)
-            {
-                if(!sourceComponentsType.Contains(targetComponent.GetType()))
-                {
-                    var component = originalPrefab.AddComponent(targetComponent.GetType());
-                }
-            }
-            
-        }
         
         /// <summary>
         /// Instantiates all component prefabs in screens and components (for nested component support)
@@ -156,7 +157,6 @@ namespace UnityFigmaBridge.Editor.Components
         {
             var assetPath = AssetDatabase.GetAssetPath(sourcePrefab);
             var prefabContents = PrefabUtility.LoadPrefabContents(assetPath);
-
             var targetPlaceHolderComponents = prefabContents.GetComponentsInChildren<FigmaComponentNodeMarker>()
                 .Where(t => PrefabUtility.GetNearestPrefabInstanceRoot(t.gameObject) == null)
                 .ToList();
@@ -200,6 +200,17 @@ namespace UnityFigmaBridge.Editor.Components
             try
             {
                 //TODO Try to apply the changes only on the prefab before saving
+                if (figmaImportProcessData.Settings.UpdateExistingPrefab)
+                {
+                    var prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(prefabContents.name, 0, true);
+                    var prefabCopy = File.Exists(prefabBackupPath) ? PrefabUtility.LoadPrefabContents(prefabBackupPath) : null;
+                    if (prefabCopy != null)
+                    {
+                        FigmaDataUtils.AddMissingComponentToPrefab(prefabCopy, prefabContents);
+                        PrefabUtility.UnloadPrefabContents(prefabCopy);
+                    }
+                }
+
                 PrefabUtility.SaveAsPrefabAsset(prefabContents, assetPath);
 
                 foreach (var modifiedPrefabInstance in modifiedPrefabInstances)

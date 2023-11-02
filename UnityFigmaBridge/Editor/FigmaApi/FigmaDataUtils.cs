@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace UnityFigmaBridge.Editor.FigmaApi
@@ -535,6 +537,51 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             if (parentNode == null) return false;
             if (parentNode is { type: NodeType.CANVAS or NodeType.SECTION }) return true;
             return false;
+        }
+
+        public static void AddMissingComponentToPrefab(GameObject originalPrefab, GameObject newPrefab)
+        {
+            // Iterate through all components of the new GameObject
+            List<Type> sourceComponentsType = newPrefab.GetComponents<UnityEngine.Component>().Select(x => x.GetType()).ToList();
+            UnityEngine.Component[] originalComponents = originalPrefab.GetComponents<UnityEngine.Component>();
+
+            foreach (UnityEngine.Component originalComponent in originalComponents)
+            {
+                if (!sourceComponentsType.Contains(originalComponent.GetType()))
+                {
+                    var component = newPrefab.AddComponent(originalComponent.GetType());
+                    FieldInfo[] fields = originalComponent.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    foreach (FieldInfo field in fields)
+                    {
+                        // Copy the value from the source component's field to the target component's field
+                        field.SetValue(component, field.GetValue(originalComponent));
+                    }
+                }
+            }
+
+            GameObject originalChild;
+            GameObject newChild;
+            bool hasChild = false;
+            for (int i = 0; i < originalPrefab.transform.childCount; i++)
+            {
+                originalChild = originalPrefab.transform.GetChild(i).gameObject;
+                for (int j = 0; j < newPrefab.transform.childCount; j++)
+                {
+                    newChild = newPrefab.transform.GetChild(j).gameObject;
+                    if (originalChild.name == newChild.name)
+                    {
+                        hasChild = true;
+                        break;
+                    }
+                    hasChild = false;
+                }
+
+                if (!hasChild)
+                {
+                    newChild = GameObject.Instantiate(originalChild, newPrefab.transform);
+                }
+            }
+
         }
     }
 }

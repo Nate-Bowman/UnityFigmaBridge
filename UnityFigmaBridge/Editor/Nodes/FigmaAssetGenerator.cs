@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -258,9 +260,17 @@ namespace UnityFigmaBridge.Editor.Nodes
             // We want prefab to be stored with a default position, so reset and restore
             var current = screenRectTransform.anchoredPosition;
             screenRectTransform.anchoredPosition = Vector2.zero;
+            var prefabAssetPath = FigmaPaths.GetPathForScreenPrefab(node, screenNameCount);
             // Write prefab
+            if (File.Exists(prefabAssetPath) && figmaImportProcessData.Settings.UpdateExistingPrefab)
+            {
+                var prefabContents = PrefabUtility.LoadPrefabContents(prefabAssetPath);
+                FigmaDataUtils.AddMissingComponentToPrefab(prefabContents, screenRectTransform.gameObject);
+                PrefabUtility.UnloadPrefabContents(prefabContents);
+
+            }
             var screenPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(screenRectTransform.gameObject,
-                    FigmaPaths.GetPathForScreenPrefab(node,screenNameCount), InteractionMode.UserAction);
+                    prefabAssetPath, InteractionMode.UserAction);
             // Restore original position
             screenRectTransform.anchoredPosition = current;
 
@@ -279,6 +289,7 @@ namespace UnityFigmaBridge.Editor.Nodes
             
             figmaImportProcessData.ScreenPrefabs.Add(screenPrefab);
         }
+
 
         private static void ReplaceChildObjectsWithPrefabsInScreen(RectTransform screenTransform)
         {
@@ -332,9 +343,16 @@ namespace UnityFigmaBridge.Editor.Nodes
             
             // Increment count to ensure no naming collisions
             figmaImportProcessData.PagePrefabNameCounter[node.name] = pageNameCount + 1;
-
+            var prefabAssetPath = FigmaPaths.GetPathForPagePrefab(node, pageNameCount);
+            // Write prefab
+            if (File.Exists(prefabAssetPath) && figmaImportProcessData.Settings.UpdateExistingPrefab)
+            {
+                var prefabContents = PrefabUtility.LoadPrefabContents(prefabAssetPath);
+                FigmaDataUtils.AddMissingComponentToPrefab(prefabContents, pageGameObject);
+                PrefabUtility.UnloadPrefabContents(prefabContents);
+            }
             var pagePrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(pageGameObject,
-                FigmaPaths.GetPathForPagePrefab(node,pageNameCount),InteractionMode.UserAction);
+                prefabAssetPath,InteractionMode.UserAction);
             figmaImportProcessData.PagePrefabs.Add(pagePrefab);
         }
 
