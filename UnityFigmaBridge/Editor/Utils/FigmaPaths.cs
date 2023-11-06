@@ -94,13 +94,27 @@ namespace UnityFigmaBridge.Editor.Utils
         public static string GetPathForScreenPrefab(Node node, int duplicateCount, bool backup = false)
         {
             string folder = backup ? FigmaScreenPrefabBackupFolder : FigmaScreenPrefabFolder;
-            return $"{folder}/{GetFileNameForNode(node, duplicateCount)}.prefab";
+            return GetPathForScreenPrefab(node.name, duplicateCount, backup);
         }
 
+        public static string GetPathForScreenPrefab(string nodeName, int duplicateCount, bool backup = false)
+        {
+            string folder = backup ? FigmaScreenPrefabBackupFolder : FigmaScreenPrefabFolder;
+            if (duplicateCount > 0) nodeName += $"_{duplicateCount}";
+            nodeName = ReplaceUnsafeCharacters(nodeName);
+            return $"{folder}/{nodeName}.prefab";
+        }
         public static string GetPathForPagePrefab(Node node, int duplicateCount, bool backup = false)
         {
-            string folder = backup ? FigmaPagePrefabBackupFolder : FigmaScreenPrefabFolder;
-            return $"{folder}/{GetFileNameForNode(node, duplicateCount)}.prefab";
+            return GetPathForPagePrefab(node.name, duplicateCount, backup);
+        }
+
+        public static string GetPathForPagePrefab(string nodeName, int duplicateCount, bool backup = false)
+        {
+            string folder = backup ? FigmaPagePrefabBackupFolder : FigmaPagePrefabFolder;
+            if (duplicateCount > 0) nodeName += $"_{duplicateCount}";
+            nodeName = ReplaceUnsafeCharacters(nodeName);
+            return $"{folder}/{nodeName}.prefab";
         }
 
         public static string GetPathForComponentPrefab(string nodeName, int duplicateCount, bool backup = false)
