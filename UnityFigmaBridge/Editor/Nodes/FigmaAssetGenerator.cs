@@ -261,14 +261,6 @@ namespace UnityFigmaBridge.Editor.Nodes
             var current = screenRectTransform.anchoredPosition;
             screenRectTransform.anchoredPosition = Vector2.zero;
             var prefabAssetPath = FigmaPaths.GetPathForScreenPrefab(node, screenNameCount);
-            // Write prefab
-            if (File.Exists(prefabAssetPath) && figmaImportProcessData.Settings.UpdateExistingPrefab)
-            {
-                var prefabContents = PrefabUtility.LoadPrefabContents(prefabAssetPath);
-                FigmaDataUtils.AddMissingComponentToPrefab(prefabContents, screenRectTransform.gameObject);
-                PrefabUtility.UnloadPrefabContents(prefabContents);
-
-            }
             var screenPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(screenRectTransform.gameObject,
                     prefabAssetPath, InteractionMode.UserAction);
             // Restore original position
@@ -345,12 +337,6 @@ namespace UnityFigmaBridge.Editor.Nodes
             figmaImportProcessData.PagePrefabNameCounter[node.name] = pageNameCount + 1;
             var prefabAssetPath = FigmaPaths.GetPathForPagePrefab(node, pageNameCount);
             // Write prefab
-            if (File.Exists(prefabAssetPath) && figmaImportProcessData.Settings.UpdateExistingPrefab)
-            {
-                var prefabContents = PrefabUtility.LoadPrefabContents(prefabAssetPath);
-                FigmaDataUtils.AddMissingComponentToPrefab(prefabContents, pageGameObject);
-                PrefabUtility.UnloadPrefabContents(prefabContents);
-            }
             var pagePrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(pageGameObject,
                 prefabAssetPath,InteractionMode.UserAction);
             figmaImportProcessData.PagePrefabs.Add(pagePrefab);

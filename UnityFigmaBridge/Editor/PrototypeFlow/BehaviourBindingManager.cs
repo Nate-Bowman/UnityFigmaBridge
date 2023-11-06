@@ -224,13 +224,6 @@ namespace UnityFigmaBridge.Editor.PrototypeFlow
                 string prefabAssetPath = AssetDatabase.GetAssetPath(sourcePrefab);
                 GameObject instantiatedPrefab = PrefabUtility.LoadPrefabContents(prefabAssetPath);
                 BindBehaviourToNodeAndChildren(instantiatedPrefab,figmaImportProcessData);
-                string prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(sourcePrefab.name, 0, true);
-                if (figmaImportProcessData.Settings.UpdateExistingPrefab && File.Exists(prefabBackupPath))
-                {
-                    GameObject backup = PrefabUtility.LoadPrefabContents(prefabBackupPath);
-                    FigmaDataUtils.AddMissingComponentToPrefab(backup, instantiatedPrefab);
-                    PrefabUtility.UnloadPrefabContents(backup);
-                }
 
                 // Write prefab with changes
                 PrefabUtility.SaveAsPrefabAsset(instantiatedPrefab, prefabAssetPath);
