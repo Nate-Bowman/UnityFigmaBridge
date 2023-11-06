@@ -325,6 +325,7 @@ namespace UnityFigmaBridge.Editor
             // Build a list of page IDs to download
             var downloadPageIdList = downloadPageNodeList.Select(p => p.id).ToList();
             FigmaPaths.Setup(settings);
+
             if (settings.UpdateExistingPrefab)
             {
                 //FigmaPaths.DeleteBackup();
@@ -506,6 +507,8 @@ namespace UnityFigmaBridge.Editor
                 // Write CS file with references to flowScreen name
                 if (s_UnityFigmaBridgeSettings.CreateScreenNameCSharpFile) ScreenNameCodeGenerator.WriteScreenNamesCodeFile(figmaBridgeProcessData.ScreenPrefabs);
             }
+
+            FigmaDataUtils.ApplyDeltaToPrefabs();
             CleanUpPostGeneration();
             EditorUtility.ClearProgressBar();
             AssetDatabase.Refresh();
