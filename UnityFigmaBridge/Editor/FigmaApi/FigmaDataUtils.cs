@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
+using UnityFigmaBridge.Editor.Utils;
 
 namespace UnityFigmaBridge.Editor.FigmaApi
 {
@@ -536,9 +539,79 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             return false;
         }
 
-        public static void AddMissingComponentToPrefab(GameObject originalPrefab, GameObject newPrefab)
+        private static void ApplyDeltaToPrefab(FileInfo file, int nodeType)
         {
-            // Iterate through all components of the new GameObject
+            GameObject instantiatedPrefab = PrefabUtility.LoadPrefabContents(file.FullName);
+            string prefabBackupPath;
+            if (nodeType == 0)
+                prefabBackupPath = FigmaPaths.GetPathForPagePrefab(instantiatedPrefab.name, 0, true);
+            else if (nodeType == 1)
+                prefabBackupPath = FigmaPaths.GetPathForScreenPrefab(instantiatedPrefab.name, 0, true);
+            else
+                prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(instantiatedPrefab.name, 0, true);
+
+            if (File.Exists(prefabBackupPath))
+            {
+                GameObject backup = PrefabUtility.LoadPrefabContents(prefabBackupPath);
+                AddMissingObjectToPrefab(backup, instantiatedPrefab);
+                PrefabUtility.UnloadPrefabContents(backup);
+            }
+
+            // Write prefab with changes
+            PrefabUtility.SaveAsPrefabAsset(instantiatedPrefab, file.FullName);
+            PrefabUtility.UnloadPrefabContents(instantiatedPrefab);
+        }
+
+        public static void ApplyDeltaToPrefabs()
+        {
+            //  Create directory for pages if required 
+            if (Directory.Exists(FigmaPaths.FigmaPagePrefabBackupFolder))
+            {
+
+                // Copy existing prefabs for pages
+                if (Directory.Exists(FigmaPaths.FigmaPagePrefabFolder))
+                {
+                    foreach (var file in new DirectoryInfo(FigmaPaths.FigmaPagePrefabFolder).GetFiles())
+                    {
+                        if (file.Extension != ".meta")
+                            ApplyDeltaToPrefab(file, 0);
+                    }
+                }
+            }
+
+            //  Create directory for pages if required 
+            if (Directory.Exists(FigmaPaths.FigmaScreenPrefabBackupFolder))
+            {
+
+                if (Directory.Exists(FigmaPaths.FigmaScreenPrefabFolder))
+                {
+                    // Copy existing prefabs for pages
+                    foreach (var file in new DirectoryInfo(FigmaPaths.FigmaScreenPrefabFolder).GetFiles())
+                    {
+                        if (file.Extension != ".meta")
+                            ApplyDeltaToPrefab(file, 1);
+                    }
+                }
+            }
+
+            //  Create directory for pages if required 
+            if (Directory.Exists(FigmaPaths.FigmaComponentPrefabBackupFolder))
+            {
+
+                if (Directory.Exists(FigmaPaths.FigmaComponentPrefabFolder))
+                {
+                    // Copy existing prefabs for pages
+                    foreach (var file in new DirectoryInfo(FigmaPaths.FigmaComponentPrefabFolder).GetFiles())
+                    {
+                        if (file.Extension != ".meta")
+                            ApplyDeltaToPrefab(file, 2);
+                    }
+                }
+            }
+        }
+
+        private static void AddMissingComponentToPrefab(GameObject originalPrefab, GameObject newPrefab)
+        {
             List<Type> sourceComponentsType = newPrefab.GetComponents<UnityEngine.Component>().Select(x => x.GetType()).ToList();
             UnityEngine.Component[] originalComponents = originalPrefab.GetComponents<UnityEngine.Component>();
 
@@ -546,15 +619,23 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             {
                 if (!sourceComponentsType.Contains(originalComponent.GetType()))
                 {
-                    var component = newPrefab.AddComponent(originalComponent.GetType());
-                    FieldInfo[] fields = originalComponent.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    var componentType = originalComponent.GetType();
+                    var component = newPrefab.AddComponent(componentType);
+                    FieldInfo[] fields = componentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     foreach (FieldInfo field in fields)
                     {
                         // Copy the value from the source component's field to the target component's field
-                        field.SetValue(component, field.GetValue(originalComponent));
+                        object originalValue = field.GetValue(originalComponent);
+                        field.SetValue(component, originalValue);
                     }
                 }
             }
+        }
+
+        public static void AddMissingObjectToPrefab(GameObject originalPrefab, GameObject newPrefab)
+        {
+            // Iterate through all components of the new GameObject
+            AddMissingComponentToPrefab(originalPrefab, newPrefab);
 
             GameObject originalChild;
             GameObject newChild;
