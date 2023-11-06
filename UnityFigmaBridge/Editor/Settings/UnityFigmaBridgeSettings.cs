@@ -22,6 +22,9 @@ namespace UnityFigmaBridge.Editor.Settings
         [Tooltip("Setup the root path of Figma assets")]
         public string FigmaAssetRootPath = "Assets/Figma";
 
+        [Tooltip("Setup the root path of Figma assets")]
+        public string FigmaBackupAssetRootPath = "Assets/Editor/Figma/Backup";
+
         [Tooltip("Enable Auto layout components (Horizontal/Vertical layout) (EXPERIMENTAL)")]
         public bool EnableAutoLayout = false;
         

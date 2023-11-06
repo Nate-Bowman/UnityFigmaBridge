@@ -216,7 +216,6 @@ Big thanks for  making those available online!
 
 ## Currently unsupported
 
-* User defined locations for saving assets
 * Image tweaks (Exposure, Contrast)
 * Blur on shadows (Except on Text)
 * Ellipse sweep angles and fill ratio

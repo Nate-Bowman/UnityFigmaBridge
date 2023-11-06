@@ -54,9 +54,22 @@ namespace UnityFigmaBridge.Editor.Utils
             if (!string.IsNullOrEmpty(figmaImportProcessDataSettings.FigmaAssetRootPath))
             {
                 FigmaAssetsRootFolder = figmaImportProcessDataSettings.FigmaAssetRootPath;
+                FigmaPagePrefabFolder = $"{FigmaAssetsRootFolder}/Pages";
+                FigmaScreenPrefabFolder = $"{FigmaAssetsRootFolder}/Screens";
+                FigmaComponentPrefabFolder = $"{FigmaAssetsRootFolder}/Components";
+                FigmaImageFillFolder = $"{FigmaAssetsRootFolder}/ImageFills";
+                FigmaServerRenderedImagesFolder = $"{FigmaAssetsRootFolder}/ServerRenderedImages";
+                FigmaFontMaterialPresetsFolder = $"{FigmaAssetsRootFolder}/FontMaterialPresets";
+                FigmaFontsFolder = $"{FigmaAssetsRootFolder}/Fonts";
+            }
+            if (!string.IsNullOrEmpty(figmaImportProcessDataSettings.FigmaBackupAssetRootPath))
+            {
+                FigmaAssetsBackupFolder = figmaImportProcessDataSettings.FigmaBackupAssetRootPath;
+                FigmaPagePrefabBackupFolder = $"{FigmaAssetsBackupFolder}/Pages";
+                FigmaScreenPrefabBackupFolder = $"{FigmaAssetsBackupFolder}/Screens";
+                FigmaComponentPrefabBackupFolder = $"{FigmaAssetsBackupFolder}/Components";
             }
         }
-
 
         public static string GetPathForImageFill(string imageId)
         {
@@ -194,9 +207,12 @@ namespace UnityFigmaBridge.Editor.Utils
             }
 
             // Copy existing prefabs for pages
-            foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
+            if (Directory.Exists(FigmaPagePrefabFolder))
             {
-                file.CopyTo(FigmaPagePrefabBackupFolder, true);
+                foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
+                {
+                    file.CopyTo(FigmaPagePrefabBackupFolder, true);
+                }
             }
 
             //  Create directory for pages if required 
@@ -205,10 +221,13 @@ namespace UnityFigmaBridge.Editor.Utils
                 Directory.CreateDirectory(FigmaScreenPrefabBackupFolder);
             }
 
-            // Copy existing prefabs for pages
-            foreach (var file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
+            if (Directory.Exists(FigmaScreenPrefabFolder))
             {
-                file.CopyTo(FigmaScreenPrefabBackupFolder, true);
+                // Copy existing prefabs for pages
+                foreach (var file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
+                {
+                    file.CopyTo(FigmaScreenPrefabBackupFolder, true);
+                }
             }
 
             //  Create directory for pages if required 
@@ -217,12 +236,14 @@ namespace UnityFigmaBridge.Editor.Utils
                 Directory.CreateDirectory(FigmaComponentPrefabBackupFolder);
             }
 
-            // Copy existing prefabs for pages
-            foreach (var file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles())
+            if (Directory.Exists(FigmaComponentPrefabFolder))
             {
-                file.CopyTo(FigmaComponentPrefabBackupFolder, true);
+                // Copy existing prefabs for pages
+                foreach (var file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles())
+                {
+                    file.CopyTo(FigmaComponentPrefabBackupFolder, true);
+                }
             }
-
         }
 
         public static void DeleteBackup()
