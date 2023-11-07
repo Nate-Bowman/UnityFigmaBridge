@@ -64,7 +64,17 @@ namespace UnityFigmaBridge.Editor
         {
             SyncAsync();
         }
-        
+
+        [MenuItem("Figma Bridge/Backup Figma Prefab")]
+        static void Backup()
+		{
+            if (s_UnityFigmaBridgeSettings == null)
+                s_UnityFigmaBridgeSettings = UnityFigmaBridgeSettingsProvider.FindUnityBridgeSettingsAsset();
+
+            FigmaPaths.Setup(s_UnityFigmaBridgeSettings);
+            FigmaPaths.BackupPrefabs();
+        }
+
         private static async void SyncAsync()
         {
             var requirementsMet = CheckRequirements();
@@ -500,15 +510,14 @@ namespace UnityFigmaBridge.Editor
                         canvasScaler.matchWidthOrHeight = (defaultSize.x>defaultSize.y) ? 1f : 0f; // Use height as driver
                         canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                     }
-
-                    var screenInstance=(GameObject)PrefabUtility.InstantiatePrefab(defaultScreenData.FigmaScreenPrefab, figmaBridgeProcessData.PrototypeFlowController.ScreenParentTransform);
+                    FigmaDataUtils.ApplyDeltaToPrefabs();
+                    var screenInstance =(GameObject)PrefabUtility.InstantiatePrefab(defaultScreenData.FigmaScreenPrefab, figmaBridgeProcessData.PrototypeFlowController.ScreenParentTransform);
                     figmaBridgeProcessData.PrototypeFlowController.SetCurrentScreen(screenInstance,defaultScreenData.FigmaNodeId,true);
                 }
                 // Write CS file with references to flowScreen name
                 if (s_UnityFigmaBridgeSettings.CreateScreenNameCSharpFile) ScreenNameCodeGenerator.WriteScreenNamesCodeFile(figmaBridgeProcessData.ScreenPrefabs);
             }
 
-            FigmaDataUtils.ApplyDeltaToPrefabs();
             CleanUpPostGeneration();
             EditorUtility.ClearProgressBar();
             AssetDatabase.Refresh();
