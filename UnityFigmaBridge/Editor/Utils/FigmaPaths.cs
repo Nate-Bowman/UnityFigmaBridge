@@ -225,7 +225,7 @@ namespace UnityFigmaBridge.Editor.Utils
             {
                 foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
                 {
-                    file.CopyTo(FigmaPagePrefabBackupFolder, true);
+                    file.CopyTo(Path.Combine(FigmaPagePrefabBackupFolder, file.Name), true);
                 }
             }
 
@@ -240,7 +240,7 @@ namespace UnityFigmaBridge.Editor.Utils
                 // Copy existing prefabs for pages
                 foreach (var file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
                 {
-                    file.CopyTo(FigmaScreenPrefabBackupFolder, true);
+                    file.CopyTo(Path.Combine(FigmaScreenPrefabBackupFolder, file.Name), true);
                 }
             }
 
@@ -255,7 +255,7 @@ namespace UnityFigmaBridge.Editor.Utils
                 // Copy existing prefabs for pages
                 foreach (var file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles())
                 {
-                    file.CopyTo(FigmaComponentPrefabBackupFolder, true);
+                    file.CopyTo(Path.Combine(FigmaComponentPrefabBackupFolder, file.Name), true);
                 }
             }
         }

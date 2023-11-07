@@ -657,8 +657,17 @@ namespace UnityFigmaBridge.Editor.FigmaApi
 
                 if (!hasChild)
                 {
-                    newChild = GameObject.Instantiate(originalChild, newPrefab.transform);
-                    newChild.name = originalChild.name;
+                    GameObject originalChildPrefab = (GameObject)PrefabUtility.InstantiatePrefab(originalChild);
+                    if (originalChildPrefab == null)
+                    {
+                        newChild = GameObject.Instantiate(originalChild, newPrefab.transform);
+                        newChild.name = originalChild.name;
+                    }
+                    else
+                    {
+                        UnityUiUtils.CloneTransformData(originalChildPrefab.transform as RectTransform, originalChild.transform as RectTransform);
+                        PrefabUtility.RecordPrefabInstancePropertyModifications(originalChildPrefab);
+                    }
                 }
             }
 
