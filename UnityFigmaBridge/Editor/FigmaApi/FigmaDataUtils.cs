@@ -541,14 +541,24 @@ namespace UnityFigmaBridge.Editor.FigmaApi
 
         private static void ApplyDeltaToPrefab(FileInfo file, int nodeType)
         {
-            GameObject instantiatedPrefab = PrefabUtility.LoadPrefabContents(file.FullName);
+            GameObject instantiatedPrefab;
+            string fileName = Path.GetFileNameWithoutExtension(file.Name);
             string prefabBackupPath;
             if (nodeType == 0)
-                prefabBackupPath = FigmaPaths.GetPathForPagePrefab(instantiatedPrefab.name, 0, true);
+            {
+                instantiatedPrefab = PrefabUtility.LoadPrefabContents(FigmaPaths.GetPathForPagePrefab(fileName, 0, false));
+                prefabBackupPath = FigmaPaths.GetPathForPagePrefab(fileName, 0, true);
+            }
             else if (nodeType == 1)
-                prefabBackupPath = FigmaPaths.GetPathForScreenPrefab(instantiatedPrefab.name, 0, true);
+            {
+                instantiatedPrefab = PrefabUtility.LoadPrefabContents(FigmaPaths.GetPathForScreenPrefab(fileName, 0, false));
+                prefabBackupPath = FigmaPaths.GetPathForScreenPrefab(fileName, 0, true);
+            }
             else
-                prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(instantiatedPrefab.name, 0, true);
+            {
+                instantiatedPrefab = PrefabUtility.LoadPrefabContents(FigmaPaths.GetPathForComponentPrefab(fileName, 0, false));
+                prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(fileName, 0, true);
+            }
 
             if (File.Exists(prefabBackupPath))
             {
@@ -657,7 +667,8 @@ namespace UnityFigmaBridge.Editor.FigmaApi
 
                 if (!hasChild)
                 {
-                    GameObject originalChildPrefab = (GameObject)PrefabUtility.InstantiatePrefab(originalChild);
+                    var originalChildPrefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(originalChild);
+                    GameObject originalChildPrefab = string.IsNullOrEmpty(originalChildPrefabPath) ? null : (GameObject)AssetDatabase.LoadMainAssetAtPath(originalChildPrefabPath);
                     if (originalChildPrefab == null)
                     {
                         newChild = GameObject.Instantiate(originalChild, newPrefab.transform);
@@ -665,8 +676,8 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                     }
                     else
                     {
-                        UnityUiUtils.CloneTransformData(originalChildPrefab.transform as RectTransform, originalChild.transform as RectTransform);
-                        PrefabUtility.RecordPrefabInstancePropertyModifications(originalChildPrefab);
+                        GameObject originalChildPrefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(originalChildPrefab, newPrefab.transform);
+                        PrefabUtility.RecordPrefabInstancePropertyModifications(originalChildPrefabInstance);
                     }
                 }
             }

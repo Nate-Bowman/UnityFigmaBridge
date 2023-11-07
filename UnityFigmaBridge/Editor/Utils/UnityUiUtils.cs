@@ -21,9 +21,10 @@ namespace UnityFigmaBridge.Editor.Utils
             rectTransform.sizeDelta=Vector2.zero;
         }
         
-        public static void CloneTransformData(RectTransform source, RectTransform destination)
+        public static void CloneTransformData(RectTransform source, RectTransform destination, bool setParent = true)
         {
-            destination.SetParent(source.parent);
+            if (setParent)
+                destination.SetParent(source.parent);
             destination.anchorMin = source.anchorMin;
             destination.anchorMax = source.anchorMax;
             destination.anchoredPosition = source.anchoredPosition;
