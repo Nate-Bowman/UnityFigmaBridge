@@ -55,12 +55,30 @@ namespace UnityFigmaBridge.Editor.Fonts
         {
             // If already loaded, ignore
             if (s_FontDefinitions != null) return;
-            var fontDataFile = AssetDatabase.LoadAssetAtPath("Assets/UnityFigmaBridge/UnityFigmaBridge/Assets/google-fonts.json", typeof(TextAsset)) as TextAsset;
+
+            string path = PlayerPrefs.GetString("GoogleFontFolderPath");
+            if (string.IsNullOrEmpty(path))
+            {
+                EditorUtility.OpenFolderPanel("Select Folder", Application.persistentDataPath, "");
+
+                if (!string.IsNullOrEmpty(path))
+                {
+                    SavePathToPlayerPrefs(path);
+                }
+            }
+            var fontDataFile = AssetDatabase.LoadAssetAtPath(path, typeof(TextAsset)) as TextAsset;
             Debug.Log($"Font data loaded {fontDataFile.text.Length}");
             s_FontDefinitions = JsonConvert.DeserializeObject<Dictionary<string, GoogleFontDefinition>>(fontDataFile.text);
             Debug.Log($"Fonts found {s_FontDefinitions.Count}");
         }
-        
+
+        private static void SavePathToPlayerPrefs(string path)
+        {
+            PlayerPrefs.SetString("GoogleFontFolderPath", path);
+            PlayerPrefs.Save();
+            Debug.Log("Path saved: " + path);
+        }
+
         /// <summary>
         /// Path to a TTF font downloaded from Google Fonts
         /// </summary>
