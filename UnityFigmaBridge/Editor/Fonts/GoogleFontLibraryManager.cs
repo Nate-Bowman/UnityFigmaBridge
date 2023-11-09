@@ -65,6 +65,8 @@ namespace UnityFigmaBridge.Editor.Fonts
                 {
                     SavePathToPlayerPrefs(path);
                 }
+                else
+                    throw new Exception("You need a path to folder containing google-font.json");
             }
             string projectRelativePath = "Assets" + path.Substring(Application.dataPath.Length);
             var fontDataFile = AssetDatabase.LoadAssetAtPath(Path.Combine(projectRelativePath, "google-fonts.json"), typeof(TextAsset)) as TextAsset;
