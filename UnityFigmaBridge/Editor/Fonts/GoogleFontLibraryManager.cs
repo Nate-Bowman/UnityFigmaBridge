@@ -66,7 +66,7 @@ namespace UnityFigmaBridge.Editor.Fonts
                     SavePathToPlayerPrefs(path);
                 }
             }
-            var fontDataFile = AssetDatabase.LoadAssetAtPath(path, typeof(TextAsset)) as TextAsset;
+            var fontDataFile = AssetDatabase.LoadAssetAtPath(Path.Combine(path, "google-fonts.json"), typeof(TextAsset)) as TextAsset;
             Debug.Log($"Font data loaded {fontDataFile.text.Length}");
             s_FontDefinitions = JsonConvert.DeserializeObject<Dictionary<string, GoogleFontDefinition>>(fontDataFile.text);
             Debug.Log($"Fonts found {s_FontDefinitions.Count}");
