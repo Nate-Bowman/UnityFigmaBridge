@@ -50,7 +50,7 @@ namespace UnityFigmaBridge.Editor.Fonts
     public static class GoogleFontLibraryManager
     {
         private static Dictionary<string, GoogleFontDefinition> s_FontDefinitions;
-        
+
         public static void LoadFontData()
         {
             // If already loaded, ignore
@@ -59,14 +59,16 @@ namespace UnityFigmaBridge.Editor.Fonts
             string path = PlayerPrefs.GetString("GoogleFontFolderPath");
             if (string.IsNullOrEmpty(path))
             {
-                EditorUtility.OpenFolderPanel("Select Folder", Application.persistentDataPath, "");
+                path = EditorUtility.OpenFolderPanel("Select Folder", Application.dataPath, "");
 
                 if (!string.IsNullOrEmpty(path))
                 {
                     SavePathToPlayerPrefs(path);
                 }
             }
-            var fontDataFile = AssetDatabase.LoadAssetAtPath(Path.Combine(path, "google-fonts.json"), typeof(TextAsset)) as TextAsset;
+            string projectRelativePath = "Assets" + path.Substring(Application.dataPath.Length);
+            var fontDataFile = AssetDatabase.LoadAssetAtPath(Path.Combine(projectRelativePath, "google-fonts.json"), typeof(TextAsset)) as TextAsset;
+
             Debug.Log($"Font data loaded {fontDataFile.text.Length}");
             s_FontDefinitions = JsonConvert.DeserializeObject<Dictionary<string, GoogleFontDefinition>>(fontDataFile.text);
             Debug.Log($"Fonts found {s_FontDefinitions.Count}");
