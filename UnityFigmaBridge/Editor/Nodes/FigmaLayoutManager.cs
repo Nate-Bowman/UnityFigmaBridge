@@ -116,6 +116,15 @@ namespace UnityFigmaBridge.Editor.Nodes
                                 _ => layoutGroup.childAlignment
                             };
                             break;
+                        case Node.PrimaryAxisAlignItems.SPACE_BETWEEN:
+                            layoutGroup.childAlignment = node.counterAxisAlignItems switch
+                            {
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
+                                _ => layoutGroup.childAlignment
+                            };
+                            break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
@@ -125,34 +134,50 @@ namespace UnityFigmaBridge.Editor.Nodes
                     layoutGroup= UnityUiUtils.GetOrAddComponent<HorizontalLayoutGroup>(targetLayoutObject);
                     layoutGroup.childForceExpandWidth= layoutGroup.childForceExpandHeight = false;
                     // Setup alignment according to Figma layout. Primary is Horizontal
-                    layoutGroup.childAlignment = node.primaryAxisAlignItems switch
+                    switch (node.primaryAxisAlignItems)
                     {
-                        // Left Alignment
-                        Node.PrimaryAxisAlignItems.MIN => node.counterAxisAlignItems switch
-                        {
-                            Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
-                            Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleLeft,
-                            Node.CounterAxisAlignItems.MAX => TextAnchor.LowerLeft,
-                            _ => layoutGroup.childAlignment
-                        },
+                        // Upper Alignment
+                        case Node.PrimaryAxisAlignItems.MIN:
+                            layoutGroup.childAlignment = node.counterAxisAlignItems switch
+                            {
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.UpperCenter,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.UpperRight,
+                                _ => layoutGroup.childAlignment
+                            };
+                            break;
                         // Center alignment
-                        Node.PrimaryAxisAlignItems.CENTER => node.counterAxisAlignItems switch
-                        {
-                            Node.CounterAxisAlignItems.MIN => TextAnchor.UpperCenter,
-                            Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
-                            Node.CounterAxisAlignItems.MAX => TextAnchor.LowerCenter,
-                            _ => layoutGroup.childAlignment
-                        },
-                        // Right alignment
-                        Node.PrimaryAxisAlignItems.MAX => node.counterAxisAlignItems switch
-                        {
-                            Node.CounterAxisAlignItems.MIN => TextAnchor.UpperRight,
-                            Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleRight,
-                            Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
-                            _ => layoutGroup.childAlignment
-                        },
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
+                        case Node.PrimaryAxisAlignItems.CENTER:
+                            layoutGroup.childAlignment = node.counterAxisAlignItems switch
+                            {
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.MiddleLeft,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.MiddleRight,
+                                _ => layoutGroup.childAlignment
+                            };
+                            break;
+                        // Lower alignment
+                        case Node.PrimaryAxisAlignItems.MAX:
+                            layoutGroup.childAlignment = node.counterAxisAlignItems switch
+                            {
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
+                                _ => layoutGroup.childAlignment
+                            };
+                            break;
+                        case Node.PrimaryAxisAlignItems.SPACE_BETWEEN:
+                            layoutGroup.childAlignment = node.counterAxisAlignItems switch
+                            {
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
+                                _ => layoutGroup.childAlignment
+                            };
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                     break;
             }
 
