@@ -119,9 +119,9 @@ namespace UnityFigmaBridge.Editor.Nodes
                         case Node.PrimaryAxisAlignItems.SPACE_BETWEEN:
                             layoutGroup.childAlignment = node.counterAxisAlignItems switch
                             {
-                                Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
-                                Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
-                                Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.UpperCenter,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.UpperRight,
                                 _ => layoutGroup.childAlignment
                             };
                             break;
@@ -169,9 +169,9 @@ namespace UnityFigmaBridge.Editor.Nodes
                         case Node.PrimaryAxisAlignItems.SPACE_BETWEEN:
                             layoutGroup.childAlignment = node.counterAxisAlignItems switch
                             {
-                                Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
-                                Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
-                                Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.UpperCenter,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.UpperRight,
                                 _ => layoutGroup.childAlignment
                             };
                             break;
@@ -185,7 +185,6 @@ namespace UnityFigmaBridge.Editor.Nodes
             layoutGroup.childControlWidth = true;
             layoutGroup.childForceExpandHeight = false;
             layoutGroup.childForceExpandWidth = false;
-            layoutGroup.childAlignment = TextAnchor.MiddleCenter;
 
             layoutGroup.padding = new RectOffset(Mathf.RoundToInt(node.paddingLeft), Mathf.RoundToInt(node.paddingRight),
                 Mathf.RoundToInt(node.paddingTop), Mathf.RoundToInt(node.paddingBottom));
