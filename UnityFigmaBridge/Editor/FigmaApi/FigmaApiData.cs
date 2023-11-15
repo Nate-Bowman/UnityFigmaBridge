@@ -965,6 +965,18 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         /// </summary>
         public TextAutoResize textAutoResize = TextAutoResize.NONE;
 
+        /// <summary>
+        /// Detemine whether this text node will truncate with an ellipsis when the text node size is smaller than the text inside.
+        /// </summary>
+        public enum TextTruncation
+        {
+            DISABLED,
+            ENDING
+        }
+
+        public TextTruncation textTruncation = TextTruncation.DISABLED;
+
+
         public enum TextAlignHorizontal
         {
             LEFT,

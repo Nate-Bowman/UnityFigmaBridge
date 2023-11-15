@@ -173,6 +173,10 @@ namespace UnityFigmaBridge.Editor.Nodes
                             case TypeStyle.TextAutoResize.TRUNCATE:
                                 contentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
                                 contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+                                if (node.style.textTruncation == TypeStyle.TextTruncation.ENDING)
+                                    text.overflowMode = TextOverflowModes.Ellipsis;
+                                else
+                                    text.overflowMode = TextOverflowModes.Truncate;
                                 break;
                         }
                     }
