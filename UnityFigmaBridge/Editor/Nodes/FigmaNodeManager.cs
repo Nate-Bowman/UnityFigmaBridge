@@ -101,7 +101,8 @@ namespace UnityFigmaBridge.Editor.Nodes
                     text.color = FigmaDataUtils.GetUnityFillColor(node.fills[0]);
                     text.fontSize = node.style.fontSize;
                     text.characterSpacing = -2.5f; // Figma handles spacing a little differently
-                   
+                    text.margin = new Vector4(0, -1.5f, 0, -1.5f); //  Figma handles text margin a little differently
+
                     text.horizontalAlignment = node.style.textAlignHorizontal switch
                     {
                         TypeStyle.TextAlignHorizontal.LEFT => HorizontalAlignmentOptions.Left,
