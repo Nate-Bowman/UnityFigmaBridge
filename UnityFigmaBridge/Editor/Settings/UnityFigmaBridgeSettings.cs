@@ -49,6 +49,11 @@ namespace UnityFigmaBridge.Editor.Settings
         [Tooltip("If true, update existing screens prefabs")]
         public bool UpdateExistingPrefab = false;
 
+        [Header("TextMeshPro FigmaText settings")]
+        [Tooltip("These settings are here as Figma text handling differs slightly from TMP")]
+        public float SpaceBetweenCharacters = -2.5f;
+        public float TextMargins = -2;
+
         [HideInInspector]
         public List<FigmaPageData> PageDataList = new ();
 
