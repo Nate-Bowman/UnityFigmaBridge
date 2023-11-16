@@ -15,8 +15,9 @@
   "version": "1.0.9",
   "type": "library",
   "hideInEditor": false,
-  "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "2.0.1-preview.1",
-    "com.unity.textmeshpro": "2.0.1"
-  }
+    "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "2.0.1-preview.1",
+        "com.unity.textmeshpro": "2.0.1",
+        "com.coffee.ui-effect": "https://github.com/mob-sakai/UIEffect.git"
+    }
 }
