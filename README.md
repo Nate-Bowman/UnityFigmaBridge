@@ -200,6 +200,7 @@ These should be imported automatically when the package is added
 
 * TextMeshPro 2.0.1
 * JSON.Net 2.01
+* Mob Sakai's UI Effect
 
 ## Other things
 
@@ -211,6 +212,7 @@ Uses:
 * [Iniqo Quilez' 2D SDF Functions](https://iquilezles.org/articles/distfunctions2d/)
 * [krzy-s UnityWebRequestAwaiter](https://gist.github.com/krzys-h/9062552e33dd7bd7fe4a6c12db109a1a)
 * [Jonathan Neal's google-fonts-complete list](https://github.com/jonathantneal/google-fonts-complete)
+* [Mob Sakai's UI Effect](https://github.com/mob-sakai/UIEffect)
 
 Big thanks for  making those available online!
 
