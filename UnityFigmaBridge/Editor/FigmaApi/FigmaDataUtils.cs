@@ -673,10 +673,12 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                     {
                         newChild = GameObject.Instantiate(originalChild, newPrefab.transform);
                         newChild.name = originalChild.name;
+                        newChild.transform.SetSiblingIndex(i);
                     }
                     else
                     {
                         GameObject originalChildPrefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(originalChildPrefab, newPrefab.transform);
+                        originalChildPrefabInstance.transform.SetSiblingIndex(i);
                         PrefabUtility.RecordPrefabInstancePropertyModifications(originalChildPrefabInstance);
                     }
                 }
