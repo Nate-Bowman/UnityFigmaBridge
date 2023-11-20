@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityFigmaBridge.Editor.Settings;
 using UnityFigmaBridge.Editor.Utils;
 
 namespace UnityFigmaBridge.Editor.FigmaApi
@@ -457,13 +458,19 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <returns></returns>
-        public static string FindPrototypeFlowStartScreenId(FigmaFile sourceFile)
+        public static string FindPrototypeFlowStartScreenId(FigmaFile sourceFile, UnityFigmaBridgeSettings settings)
         {
-            foreach (var canvasNode in sourceFile.document.children)
+            List<Node> pageNodes = GetPageNodes(sourceFile); 
+            if (settings.OnlyImportSelectedPages)
             {
-                if (canvasNode.flowStartingPoints.Length>0) return canvasNode.flowStartingPoints[0].nodeId;
+                var enabledPageIdList = settings.PageDataList.Where(p => p.Selected).Select(p => p.NodeId).ToList();
+                pageNodes = pageNodes.Where(p => enabledPageIdList.Contains(p.id)).ToList();
             }
-
+            foreach (Node pageNode in pageNodes)
+            {
+                if (pageNode.flowStartingPoints is { Length: > 0 }) return pageNode.flowStartingPoints[0].nodeId;
+            }
+            
             return string.Empty;
         }
 
@@ -636,7 +643,14 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                     {
                         // Copy the value from the source component's field to the target component's field
                         object originalValue = field.GetValue(originalComponent);
-                        field.SetValue(component, originalValue);
+                        try
+                        {
+                            field.SetValue(component, originalValue);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.Log(e);
+                        }
                     }
                 }
             }

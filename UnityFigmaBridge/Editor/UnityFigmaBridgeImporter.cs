@@ -477,7 +477,7 @@ namespace UnityFigmaBridge.Editor
                 var screenController = figmaBridgeProcessData.PrototypeFlowController;
                 
                 // Find default flow start position
-                screenController.PrototypeFlowInitialScreenId =  FigmaDataUtils.FindPrototypeFlowStartScreenId(figmaBridgeProcessData.SourceFile);;
+                screenController.PrototypeFlowInitialScreenId =  FigmaDataUtils.FindPrototypeFlowStartScreenId(figmaBridgeProcessData.SourceFile, settings);;
 
                 if (screenController.ScreenParentTransform == null)
                     screenController.ScreenParentTransform=UnityUiUtils.CreateRectTransform("ScreenParentTransform",
