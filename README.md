@@ -48,8 +48,8 @@ Please note - currently only supports **Unity 2021.3** and later!
   Essential Resources)
 * You need to install Mob-Sakai's UIEffect and Kyub emojisearch following the same process
 * (Window → Package Manager) click on the '+' -> "Add package from git URL"
-* [com.kyub.emojisearch](https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.emojisearch-1.1.5)
-* [com.coffee.ui-effect](com.coffee.ui-effect)
+* [com.kyub.emojisearch] => ```https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.emojisearch-1.1.5)```
+* [com.coffee.ui-effect] => ```com.coffee.ui-effect```
 
 ## Prototyping
 
@@ -205,6 +205,7 @@ These should be imported automatically when the package is added
 * TextMeshPro 2.0.1
 * JSON.Net 2.01
 * Mob Sakai's UI Effect
+* Rafael CS' EmojiSearch
 
 ## Other things
 
