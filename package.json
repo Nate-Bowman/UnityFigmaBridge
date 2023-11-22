@@ -18,6 +18,7 @@
     "dependencies": {
         "com.unity.nuget.newtonsoft-json": "2.0.1-preview.1",
         "com.unity.textmeshpro": "2.0.1",
-        "com.coffee.ui-effect": "https://github.com/mob-sakai/UIEffect.git#332340e"
+        "com.coffee.ui-effect": "https://github.com/mob-sakai/UIEffect.git",
+        "com.kyub.emojisearch": "https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.emojisearch-1.1.5"
     }
 }

@@ -46,6 +46,10 @@ Please note - currently only supports **Unity 2021.3** and later!
   under Settings → Account → Personal Access Tokens
 * If you don't already have TextMeshPro in your project, import TMP Essentials (Use Window → Text Mesh Pro → Import TMP
   Essential Resources)
+* You need to install Mob-Sakai's UIEffect and Kyub emojisearch following the same process
+* (Window → Package Manager) click on the '+' -> "Add package from git URL"
+* [com.kyub.emojisearch](https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.emojisearch-1.1.5)
+* [com.coffee.ui-effect](com.coffee.ui-effect)
 
 ## Prototyping
 
@@ -213,6 +217,7 @@ Uses:
 * [krzy-s UnityWebRequestAwaiter](https://gist.github.com/krzys-h/9062552e33dd7bd7fe4a6c12db109a1a)
 * [Jonathan Neal's google-fonts-complete list](https://github.com/jonathantneal/google-fonts-complete)
 * [Mob Sakai's UI Effect](https://github.com/mob-sakai/UIEffect)
+* [Rafael CS' EmojiSearch](https://forum.unity.com/threads/full-emoji-support-api-emoji-sequen.660310/)
 
 Big thanks for  making those available online!
 
