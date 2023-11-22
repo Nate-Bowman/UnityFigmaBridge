@@ -15,7 +15,7 @@ namespace UnityFigmaBridge.Editor.Nodes
         /// <param name="figmaParentNode"></param>
         /// <param name="centerPivot"></param>
         public static void ApplyFigmaTransform(RectTransform targetRectTransform, Node figmaNode, Node figmaParentNode,
-            bool centerPivot)
+            bool centerPivot, bool mergeAnchorAndPivot)
         {
             // Default to top left alignment
             targetRectTransform.anchorMin = targetRectTransform.anchorMax = new Vector2(0, 1);
@@ -67,7 +67,37 @@ namespace UnityFigmaBridge.Editor.Nodes
             // We'll also use these properties to apply pivot after, where required
             // We disable center pivot for Text nodes, as this creates behaviour different from Figma when autosizing
             if (figmaNode.type==NodeType.TEXT) centerPivot = false;
-            if (centerPivot) SetPivot(targetRectTransform, new Vector2(0.5f, 0.5f));
+            if (centerPivot && !mergeAnchorAndPivot) SetPivot(targetRectTransform, new Vector2(0.5f, 0.5f));
+            else if (mergeAnchorAndPivot && figmaNode.constraints != null)
+            {
+                Vector2 pivot = new Vector2();
+                switch (figmaNode.constraints.horizontal)
+                {
+                    case LayoutConstraint.HorizontalLayoutConstraint.LEFT:
+                        pivot.x = 0;
+                        break;
+                    case LayoutConstraint.HorizontalLayoutConstraint.RIGHT:
+                        pivot.x = 1;
+                        break;
+                    default:
+                        pivot.x = 0.5f;
+                        break;
+                }
+
+                switch (figmaNode.constraints.vertical)
+                {
+                    case LayoutConstraint.VerticalLayoutConstraint.BOTTOM:
+                        pivot.y = 0;
+                        break;
+                    case LayoutConstraint.VerticalLayoutConstraint.TOP:
+                        pivot.y = 1;
+                        break;
+                    default:
+                        pivot.y = 0.5f;
+                        break;
+                }
+                SetPivot(targetRectTransform, pivot);
+            }
         }
     
         /// <summary>

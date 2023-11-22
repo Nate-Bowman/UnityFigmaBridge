@@ -242,7 +242,7 @@ namespace UnityFigmaBridge.Editor.Components
             }
             
             // Setup transform based on node properties
-            NodeTransformManager.ApplyFigmaTransform(nodeObject.transform as RectTransform,node,parentNode,true);
+            NodeTransformManager.ApplyFigmaTransform(nodeObject.transform as RectTransform,node,parentNode,true, figmaImportProcessData.Settings.MergeAnchorAndPivot);
             
             // Apply recursively for all children
             if (node.children == null) return;

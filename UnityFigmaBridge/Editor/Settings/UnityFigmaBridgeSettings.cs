@@ -49,6 +49,9 @@ namespace UnityFigmaBridge.Editor.Settings
         [Tooltip("If true, update existing screens prefabs")]
         public bool UpdateExistingPrefab = false;
 
+        [Tooltip("If true the pivot and the anchor will be the same as the one set in Figma")]
+        public bool MergeAnchorAndPivot = true;
+
         [Header("TextMeshPro FigmaText settings")]
         [Tooltip("These settings are here as Figma text handling differs slightly from TMP")]
         public float SpaceBetweenCharacters = -2.5f;
