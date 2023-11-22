@@ -49,7 +49,7 @@ Please note - currently only supports **Unity 2021.3** and later!
 * You need to install Mob-Sakai's UIEffect and Kyub emojisearch following the same process
 * (Window → Package Manager) click on the '+' -> "Add package from git URL"
 * [com.kyub.emojisearch] => ```https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.emojisearch-1.1.5)```
-* [com.coffee.ui-effect] => ```com.coffee.ui-effect```
+* [com.coffee.ui-effect] => ```https://github.com/mob-sakai/UIEffect.git```
 
 ## Prototyping
 
