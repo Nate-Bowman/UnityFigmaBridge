@@ -18,6 +18,6 @@
     "dependencies": {
         "com.unity.nuget.newtonsoft-json": "2.0.1-preview.1",
         "com.unity.textmeshpro": "2.0.1",
-        "com.coffee.ui-effect": "https://github.com/mob-sakai/UIEffect.git"
+        "com.coffee.ui-effect": "https://github.com/mob-sakai/UIEffect.git#332340e"
     }
 }

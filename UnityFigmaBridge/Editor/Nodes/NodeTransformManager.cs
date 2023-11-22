@@ -68,7 +68,7 @@ namespace UnityFigmaBridge.Editor.Nodes
             // We disable center pivot for Text nodes, as this creates behaviour different from Figma when autosizing
             if (figmaNode.type==NodeType.TEXT) centerPivot = false;
             if (centerPivot && !mergeAnchorAndPivot) SetPivot(targetRectTransform, new Vector2(0.5f, 0.5f));
-            else if (mergeAnchorAndPivot && figmaNode.constraints != null)
+            else if (figmaNode.type!=NodeType.TEXT && mergeAnchorAndPivot && figmaNode.constraints != null)
             {
                 Vector2 pivot = new Vector2();
                 switch (figmaNode.constraints.horizontal)
