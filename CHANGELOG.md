@@ -1,4 +1,20 @@
 ﻿# Change Log:
+## 1.0.10
+- Enhancement - Adding an option for EmojiTextMeshProUGUI instead of TextMeshProUGUI
+- Enhancement - Adding a soft-shadow prefab that can be used to make soft shadow for rectangle objects using UIEffect package
+- Enhancement - Adding options to tweak TMP text handling to look closer to Figma's text
+- Enhancement - Adding a way to select the path of the containing folder of the google-font.json document and save it 
+- Bug Fix - Child order when reapplying changes to prefab
+- Bug Fix - Choose the starting screen from the flow of the current page
+- Bug Fix - Handling layout group when Figma layout was SPACE_BETWEEN
+- Change - Adding an option to choose if the pivot = anchor
+
+## 1.0.9
+- Enhancement - Soft shadow for texts
+- Enhancement - Support for prefab preservation 
+- Enhancement - Adding a way to backup Figma prefabs 
+- Enhancement - Adding custom root folder settings in the settings file
+- Bug Fix - Fixing issue with Figma prefabs 
 
 ## 1.0.8
 
