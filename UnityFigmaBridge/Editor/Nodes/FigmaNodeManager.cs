@@ -1,5 +1,6 @@
 ﻿using System;
 using TMPro;
+using Kyub.EmojiSearch.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -367,7 +368,10 @@ namespace UnityFigmaBridge.Editor.Nodes
                     break;
                 case NodeType.TEXT:
                     // For text nodes, we use TextMeshPro
-                    nodeGameObject.AddComponent<TextMeshProUGUI>();
+                    if (figmaImportProcessData.Settings.UseEmojiTMP)
+                        nodeGameObject.AddComponent<TMP_EmojiTextUGUI>();
+                    else
+                        nodeGameObject.AddComponent<TextMeshProUGUI>();
                     break;
                 case NodeType.DOCUMENT:
                     break;

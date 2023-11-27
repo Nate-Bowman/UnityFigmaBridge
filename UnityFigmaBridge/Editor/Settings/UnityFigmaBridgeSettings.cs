@@ -57,6 +57,9 @@ namespace UnityFigmaBridge.Editor.Settings
         public float SpaceBetweenCharacters = -2.5f;
         public float TextMargins = -2;
 
+        [Tooltip("If true this will use Kyub Emoji TMP instead of TextMeshPro")]
+        public bool UseEmojiTMP = true;
+        
         [HideInInspector]
         public List<FigmaPageData> PageDataList = new ();
 
