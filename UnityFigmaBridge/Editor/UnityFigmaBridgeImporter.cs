@@ -510,7 +510,8 @@ namespace UnityFigmaBridge.Editor
                         canvasScaler.matchWidthOrHeight = (defaultSize.x>defaultSize.y) ? 1f : 0f; // Use height as driver
                         canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                     }
-                    FigmaDataUtils.ApplyDeltaToPrefabs();
+                    if (settings.UpdateExistingPrefab)
+                        FigmaDataUtils.ApplyDeltaToPrefabs();
                     var screenInstance =(GameObject)PrefabUtility.InstantiatePrefab(defaultScreenData.FigmaScreenPrefab, figmaBridgeProcessData.PrototypeFlowController.ScreenParentTransform);
                     figmaBridgeProcessData.PrototypeFlowController.SetCurrentScreen(screenInstance,defaultScreenData.FigmaNodeId,true);
                 }
