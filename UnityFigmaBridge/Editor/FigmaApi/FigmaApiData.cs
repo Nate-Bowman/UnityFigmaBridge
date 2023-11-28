@@ -451,6 +451,10 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         public float g;
         public float b;
         public float a;
+        public UnityEngine.Color ToColor()
+		{
+            return new UnityEngine.Color(r, g, b, a);
+		}
     }
 
     /// <summary>
