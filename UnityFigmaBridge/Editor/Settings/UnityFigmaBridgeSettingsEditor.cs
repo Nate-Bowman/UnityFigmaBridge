@@ -19,6 +19,15 @@ namespace UnityFigmaBridge.Editor.Settings
             var onlyImportPages= targetSettingsObject.OnlyImportSelectedPages;
             var preEditUrl= targetSettingsObject.DocumentUrl;
             base.OnInspectorGUI();
+
+            if (targetSettingsObject.UseCustomTextClass)
+            {
+                targetSettingsObject.TextTypeName = EditorGUILayout.TextField("Text Type Name", targetSettingsObject.TextTypeName);
+                targetSettingsObject.TextTypeNamespace = EditorGUILayout.TextField("Text Type Namespace", targetSettingsObject.TextTypeNamespace);
+                EditorUtility.SetDirty(targetSettingsObject);
+                AssetDatabase.SaveAssetIfDirty(targetSettingsObject);
+            }
+            
             // If the URL has changed, we want to reset the select pages to off and clear
             if (targetSettingsObject.DocumentUrl != preEditUrl)
             {

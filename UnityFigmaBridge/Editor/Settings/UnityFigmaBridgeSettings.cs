@@ -59,6 +59,12 @@ namespace UnityFigmaBridge.Editor.Settings
 
         [Tooltip("If true this will use Kyub Emoji TMP instead of TextMeshPro")]
         public bool UseEmojiTMP = true;
+
+        [Tooltip("If you are willing to use your custom Text class check this")]
+        public bool UseCustomTextClass = true;
+
+        [HideInInspector] public string TextTypeNamespace;
+        [HideInInspector] public string TextTypeName;
         
         [HideInInspector]
         public List<FigmaPageData> PageDataList = new ();

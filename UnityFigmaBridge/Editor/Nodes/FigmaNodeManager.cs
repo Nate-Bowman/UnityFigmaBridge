@@ -368,10 +368,40 @@ namespace UnityFigmaBridge.Editor.Nodes
                     break;
                 case NodeType.TEXT:
                     // For text nodes, we use TextMeshPro
-                    if (figmaImportProcessData.Settings.UseEmojiTMP)
-                        nodeGameObject.AddComponent<TMP_EmojiTextUGUI>();
+                    if (figmaImportProcessData.Settings.UseCustomTextClass && !string.IsNullOrEmpty(figmaImportProcessData.Settings.TextTypeName))
+                    {
+                        string typeName = figmaImportProcessData.Settings.TextTypeName;
+                        string namespaceName = figmaImportProcessData.Settings.TextTypeNamespace;
+                        // Combine the namespace and type name
+                        string fullyQualifiedTypeName = string.IsNullOrEmpty(namespaceName)
+                            ? typeName
+                            : namespaceName + "." + typeName;
+                        fullyQualifiedTypeName += ", Assembly-CSharp";
+
+                        // Get the type based on the provided fully qualified type name
+                        Type componentType = Type.GetType(fullyQualifiedTypeName);
+
+                        // Check if the type exists
+                        if (componentType != null)
+                        {
+                            // Add the component to the GameObject
+                            nodeGameObject.AddComponent(componentType);
+
+                            // You can do additional setup or processing with the added component here
+                            Debug.Log("Added component: " + fullyQualifiedTypeName);
+                        }
+                        else
+                        {
+                            Debug.LogError("Component type not found: " + fullyQualifiedTypeName);
+                        }
+                    }
                     else
-                        nodeGameObject.AddComponent<TextMeshProUGUI>();
+                    {
+                        if (figmaImportProcessData.Settings.UseEmojiTMP)
+                            nodeGameObject.AddComponent<TMP_EmojiTextUGUI>();
+                        else
+                            nodeGameObject.AddComponent<TextMeshProUGUI>();
+                    }
                     break;
                 case NodeType.DOCUMENT:
                     break;
