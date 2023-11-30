@@ -9,7 +9,7 @@ namespace UnityFigmaBridge.Editor.Settings
     [CustomEditor(typeof(UnityFigmaBridgeSettings))]
     public sealed class UnityFigmaBridgeSettingsEditor : UnityEditor.Editor
     {
-        
+        private bool isCustomPathOpened = false;
         private static Vector2 s_PageScrollPos;
         private static Vector2 s_ScreenScrollPos;
 
@@ -24,10 +24,34 @@ namespace UnityFigmaBridge.Editor.Settings
             {
                 targetSettingsObject.TextTypeName = EditorGUILayout.TextField("Text Type Name", targetSettingsObject.TextTypeName);
                 targetSettingsObject.TextTypeNamespace = EditorGUILayout.TextField("Text Type Namespace", targetSettingsObject.TextTypeNamespace);
-                EditorUtility.SetDirty(targetSettingsObject);
-                AssetDatabase.SaveAssetIfDirty(targetSettingsObject);
             }
             
+            EditorGUILayout.Space();
+            isCustomPathOpened = EditorGUILayout.BeginFoldoutHeaderGroup(isCustomPathOpened, "Custom Paths");
+            if (isCustomPathOpened)
+            {
+                if (targetSettingsObject.UseCustomPathForScreen)
+                    targetSettingsObject.CustomPathScreen =
+                        EditorGUILayout.TextField("Custom Path Screens", targetSettingsObject.CustomPathScreen);
+                if (targetSettingsObject.UseCustomPathForComponent)
+                    targetSettingsObject.CustomPathComponent =
+                        EditorGUILayout.TextField("Custom Path Components", targetSettingsObject.CustomPathComponent);
+                if (targetSettingsObject.UseCustomPathForPage)
+                    targetSettingsObject.CustomPathPage =
+                        EditorGUILayout.TextField("Custom Path Pages", targetSettingsObject.CustomPathPage);
+                if (targetSettingsObject.UseCustomPathForFont)
+                    targetSettingsObject.CustomPathFont =
+                        EditorGUILayout.TextField("Custom Path Fonts", targetSettingsObject.CustomPathFont);
+                if (targetSettingsObject.UseCustomPathForServerRenderedImage)
+                    targetSettingsObject.CustomPathServerRenderedImage =
+                        EditorGUILayout.TextField("Custom Path Server Rendered Images",
+                            targetSettingsObject.CustomPathServerRenderedImage);
+                if (targetSettingsObject.UseCustomPathForImageFills)
+                    targetSettingsObject.CustomPathImageFills =
+                        EditorGUILayout.TextField("Custom Path Image Fills", targetSettingsObject.CustomPathImageFills);
+
+            }
+
             // If the URL has changed, we want to reset the select pages to off and clear
             if (targetSettingsObject.DocumentUrl != preEditUrl)
             {

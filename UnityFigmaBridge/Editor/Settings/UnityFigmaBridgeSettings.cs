@@ -25,6 +25,27 @@ namespace UnityFigmaBridge.Editor.Settings
         [Tooltip("Setup the root path of Figma assets")]
         public string FigmaBackupAssetRootPath = "Assets/Editor/Figma/Backup";
 
+        [Header("Custom paths for types")] 
+        public bool UseCustomPathForScreen = false;
+
+        [HideInInspector] public string CustomPathScreen;
+        public bool UseCustomPathForComponent = false;
+        [HideInInspector] public string CustomPathComponent;
+
+        public bool UseCustomPathForPage = false;
+        [HideInInspector] public string CustomPathPage;
+
+        public bool UseCustomPathForFont = false;
+        [HideInInspector] public string CustomPathFont;
+
+        public bool UseCustomPathForServerRenderedImage = false;
+        [HideInInspector] public string CustomPathServerRenderedImage;
+
+        public bool UseCustomPathForImageFills = false;
+        [HideInInspector] public string CustomPathImageFills;
+        
+        
+        [Space]
         [Tooltip("Enable Auto layout components (Horizontal/Vertical layout) (EXPERIMENTAL)")]
         public bool EnableAutoLayout = false;
         

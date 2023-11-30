@@ -69,6 +69,19 @@ namespace UnityFigmaBridge.Editor.Utils
                 FigmaScreenPrefabBackupFolder = $"{FigmaAssetsBackupFolder}/Screens";
                 FigmaComponentPrefabBackupFolder = $"{FigmaAssetsBackupFolder}/Components";
             }
+
+            if (figmaImportProcessDataSettings.UseCustomPathForScreen)
+                FigmaScreenPrefabFolder = figmaImportProcessDataSettings.CustomPathScreen;
+            if (figmaImportProcessDataSettings.UseCustomPathForComponent)
+                FigmaComponentPrefabFolder = figmaImportProcessDataSettings.CustomPathComponent;
+            if (figmaImportProcessDataSettings.UseCustomPathForPage)
+                FigmaPagePrefabFolder = figmaImportProcessDataSettings.CustomPathPage;
+            if (figmaImportProcessDataSettings.UseCustomPathForFont)
+                FigmaFontsFolder = figmaImportProcessDataSettings.CustomPathFont;
+            if (figmaImportProcessDataSettings.UseCustomPathForServerRenderedImage)
+                FigmaServerRenderedImagesFolder = figmaImportProcessDataSettings.CustomPathServerRenderedImage;
+            if (figmaImportProcessDataSettings.UseCustomPathForImageFills)
+                FigmaImageFillFolder = figmaImportProcessDataSettings.CustomPathImageFills;
         }
 
         public static string GetPathForImageFill(string imageId)
