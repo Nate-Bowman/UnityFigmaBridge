@@ -653,6 +653,27 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                         }
                     }
                 }
+                else
+                {
+                    var componentType = originalComponent.GetType();
+                    var component = newPrefab.GetComponent(componentType);
+                    FieldInfo[] fields = componentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    foreach (FieldInfo field in fields)
+                    {
+                        // Copy the value from the source component's field to the target component's field
+                        object originalValue = field.GetValue(originalComponent);
+                        object newValue = field.GetValue(component);
+                        try
+                        {
+                            if (EqualityComparer<object>.Default.Equals(newValue, default))
+                                field.SetValue(component, originalValue);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.Log(e);
+                        }
+                    }
+                }
             }
         }
 
