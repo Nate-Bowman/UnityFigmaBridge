@@ -665,7 +665,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                         object newValue = field.GetValue(component);
                         try
                         {
-                            if (EqualityComparer<object>.Default.Equals(newValue, default))
+                            if (EqualityComparer<object>.Default.Equals(newValue, default) || newValue == null)
                                 field.SetValue(component, originalValue);
                         }
                         catch (Exception e)
