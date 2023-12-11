@@ -170,63 +170,62 @@ namespace UnityFigmaBridge.Editor.Utils
             // The new delta system only applies changes with created prefabs
             // And as we can chose to only create prefabs from selected pages
             // We should be deleting previous prefabs to reduce size
-            
+
             //  Create directory for pages if required 
-            if (!Directory.Exists(FigmaPagePrefabFolder))
-            {
+            if (!Directory.Exists(FigmaPagePrefabFolder)) 
                 Directory.CreateDirectory(FigmaPagePrefabFolder);
-            }
-            
+
             // Remove existing prefabs for pages
-            foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
-            {
+            foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles()) 
                 file.Delete();
-            }
 
             //  Create directory for flowScreen prefabs if required 
-            if (!Directory.Exists(FigmaScreenPrefabFolder))
-            {
+            if (!Directory.Exists(FigmaScreenPrefabFolder)) 
                 Directory.CreateDirectory(FigmaScreenPrefabFolder);
-            }
-            
-            // Remove existing flowScreen prefabs
-            foreach (FileInfo file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
-            {
-                file.Delete();
-            }
 
-            if (!Directory.Exists(FigmaComponentPrefabFolder))
-            {
+            // Remove existing flowScreen prefabs
+            foreach (var file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles()) 
+                file.Delete();
+
+            if (!Directory.Exists(FigmaComponentPrefabFolder)) 
                 Directory.CreateDirectory(FigmaComponentPrefabFolder);
-            }
 
             // Remove existing components prefabs
-            foreach (FileInfo file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles())
-            {
+            foreach (var file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles()) 
                 file.Delete();
-            }
-            
-            //  Create directory for image fills if required 
-            if (!Directory.Exists(FigmaImageFillFolder))
-            {
-                Directory.CreateDirectory(FigmaImageFillFolder);
-            }
 
+            //  Create directory for image fills if required 
+            if (!Directory.Exists(FigmaImageFillFolder)) 
+                Directory.CreateDirectory(FigmaImageFillFolder);
+            
+            if (updatePrefabs)
+                foreach (var file in new DirectoryInfo(FigmaImageFillFolder).GetFiles()) 
+                    file.Delete();
+            
             //  Create directory for server rendered images if required 
             if (!Directory.Exists(FigmaServerRenderedImagesFolder))
-            {
                 Directory.CreateDirectory(FigmaServerRenderedImagesFolder);
-            }
-
+            
+            // Remove existing server rendered images
+            if (updatePrefabs)
+                foreach (var file in new DirectoryInfo(FigmaServerRenderedImagesFolder).GetFiles()) 
+                    file.Delete();
+            
             if (!Directory.Exists(FigmaFontMaterialPresetsFolder))
-            {
                 Directory.CreateDirectory(FigmaFontMaterialPresetsFolder);
-            }
-
-            if (!Directory.Exists(FigmaFontsFolder))
-            {
+            
+            // Remove existing FigmaFontMaterialPresetsFolder
+            if (updatePrefabs)
+                foreach (var file in new DirectoryInfo(FigmaFontMaterialPresetsFolder).GetFiles()) 
+                    file.Delete();
+            
+            if (!Directory.Exists(FigmaFontsFolder)) 
                 Directory.CreateDirectory(FigmaFontsFolder);
-            }
+            
+            // Remove existing fonts
+            if (updatePrefabs)
+                foreach (var file in new DirectoryInfo(FigmaFontsFolder).GetFiles()) 
+                    file.Delete();
         }
 
         public static void BackupPrefabs()
