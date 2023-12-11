@@ -323,11 +323,13 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             List<ServerRenderNodeData> substitutionNodeList, int recursiveNodeDepth, List<string> missingComponentIds,
             bool isSelectedPage,bool withinComponentDefinition)
         {
+            if (!isSelectedPage)
+                return;
             // Instances will already be defined by original prefab (eg that may already be rendered). Also dont attempt to render invisible nodes
             if (figmaNode.type == NodeType.INSTANCE && !missingComponentIds.Contains(figmaNode.componentId) || !figmaNode.visible) return;
             
             // Top level frames should be checked for server-side rendering
-            if ((isSelectedPage || withinComponentDefinition) && recursiveNodeDepth==1 && figmaNode.exportSettings!=null && figmaNode.exportSettings.Length > 0)
+            if (withinComponentDefinition && recursiveNodeDepth==1 && figmaNode.exportSettings!=null && figmaNode.exportSettings.Length > 0)
             {
                 Debug.Log($"Found figmaNode with export! Node {figmaNode.name}");
                 substitutionNodeList.Add( new ServerRenderNodeData
@@ -337,9 +339,8 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                 });
                 return;
             }
-
             
-            if ((isSelectedPage || withinComponentDefinition) && GetNodeSubstitutionStatus(figmaNode,recursiveNodeDepth))
+            if (withinComponentDefinition && GetNodeSubstitutionStatus(figmaNode,recursiveNodeDepth))
             {
                 substitutionNodeList.Add( new ServerRenderNodeData
                 {
@@ -429,6 +430,39 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         public static List<string> FindMissingComponentDefinitions(FigmaFile file)
         {
             return (from componentKeyPair in file.components select componentKeyPair.Key into componentId let foundNode = GetFigmaNodeWithId(file, componentId) where foundNode == null select componentId).ToList();
+        }
+
+        public static List<string> FindMissingComponentDefinitions(FigmaFile file, List<Node> selectedNodes)
+        {
+            List<string> componentIds = new List<string>();
+            bool found = false;
+            foreach (var componentKeyPair in file.components)
+            {
+                string componentId = componentKeyPair.Key;
+                var foundNode = GetFigmaNodeWithId(file, componentId);
+               
+                found = false; 
+                foreach (var node in selectedNodes)
+                {
+                    foreach (var child in node.children)
+                    {
+                        if (child.id == componentId)
+                        {    
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found)
+                        break;
+                }
+                
+                if ((foundNode == null || !found) && !componentIds.Contains(componentId))
+                {
+                    componentIds.Add(componentId);
+                }
+            }
+            return componentIds;
         }
 
         /// <summary>
@@ -614,7 +648,6 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             //  Create directory for pages if required 
             if (Directory.Exists(FigmaPaths.FigmaComponentPrefabBackupFolder))
             {
-
                 if (Directory.Exists(FigmaPaths.FigmaComponentPrefabFolder))
                 {
                     // Copy existing prefabs for pages

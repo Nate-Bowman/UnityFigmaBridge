@@ -349,7 +349,8 @@ namespace UnityFigmaBridge.Editor
 
             // Next build a list of all externally referenced components not included in the document (eg
             // from external libraries) and download
-            var externalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile);
+            var allExternalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile);
+            var externalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile, downloadPageNodeList);
 
             // For any missing component definitions, we are going to find the first instance and switch it to be
             // The source component. This has to be done early to ensure download of server images
@@ -429,6 +430,7 @@ namespace UnityFigmaBridge.Editor
             var componentData = new FigmaBridgeComponentData
             { 
                 MissingComponentDefinitionsList = externalComponentList, 
+                AllMissingComponentDefinitionsList = allExternalComponentList
             };
             
             // Stores necessary importer data needed for document generator.

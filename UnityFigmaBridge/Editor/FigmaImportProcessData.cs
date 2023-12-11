@@ -89,9 +89,14 @@ namespace UnityFigmaBridge.Editor
         private Dictionary<string, int> ComponentNameCount = new();
         
         /// <summary>
-        /// List of all missing component definitions on the file
+        /// List of all missing component definitions on the selected nodes
         /// </summary>
         public List<string> MissingComponentDefinitionsList=new();
+        
+        /// <summary>
+        /// List of all missing component definitions on the whole file
+        /// </summary>
+        public List<string> AllMissingComponentDefinitionsList=new();
         
         /// <summary>
         /// Mapping of NodeIDs to components
