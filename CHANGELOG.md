@@ -1,4 +1,11 @@
 ﻿# Change Log:
+## 1.0.11
+- Enhancement - Now only the resources and prefabs used in the currently selected page to import will be built or downloaded
+- Enhancement - User paths for each types of Figma items
+- Bug Fix - Applying properly the delta between the backup and new prefab
+- Bug Fix - Adding a null check on field comparer
+- Bug Fix - Missing condition to apply delta making the delta always being applied even without backup
+
 ## 1.0.10
 - Enhancement - Adding an option for EmojiTextMeshProUGUI instead of TextMeshProUGUI
 - Enhancement - Adding a soft-shadow prefab that can be used to make soft shadow for rectangle objects using UIEffect package

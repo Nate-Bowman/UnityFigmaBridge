@@ -3,7 +3,7 @@
   "displayName": "Unity Figma Bridge",
   "description": "Tool to build Figma documents and Assets as native Unity UI -- Forked from Simon Olivier's Unity Figma Bridge",
   "author": {
-    "name": "Simon Oliver - Enhanced by Ilygos"
+    "name": "Simon Oliver - Enhanced by Maxence Beaumont"
   },
   "keywords": [
     "unity",
@@ -12,7 +12,7 @@
   "license": "MIT",
   "unity": "2021.3",
   "unityRelease": "0f1",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "type": "library",
   "hideInEditor": false,
     "dependencies": {
