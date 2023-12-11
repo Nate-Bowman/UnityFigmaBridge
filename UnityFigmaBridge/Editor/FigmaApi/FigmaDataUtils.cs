@@ -133,8 +133,13 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         public static Node GetFigmaNodeWithId(FigmaFile file, string nodeId)
         {
             return GetFigmaNodeInChildren(file.document,nodeId);
-        }     
+        }
 
+        public static Node GetFigmaNodeWithId(Node page, string nodeId)
+        {
+            return GetFigmaNodeInChildren(page,nodeId);
+        }
+        
         /// <summary>
         /// Find a specific figmaNode within figma figmaNode tree (recursive)
         /// </summary>
@@ -208,13 +213,14 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         /// <param name="file"></param>
         /// <param name="downloadPageIdList"></param>
         /// <returns></returns>
-        public static List<string> GetAllImageFillIdsFromFile(FigmaFile file, List<string> downloadPageIdList)
+        public static List<string> GetAllImageFillIdsFromFile(FigmaFile file, List<string> downloadPageIdList, bool onlyImportImageFromSelectedPages)
         {
             var imageFillIdList = new List<string>();
             foreach (var page in file.document.children)
             {
                 var includedPage=downloadPageIdList.Contains(page.id);
-                GetAllImageFillIdsForNode(page, imageFillIdList,0,includedPage,false);
+                if ((onlyImportImageFromSelectedPages && includedPage) || !onlyImportImageFromSelectedPages)
+                    GetAllImageFillIdsForNode(page, imageFillIdList,0,includedPage,false);
             }
             return imageFillIdList;
         }
@@ -295,16 +301,20 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         /// <param name="file">Figma document</param>
         /// <param name="missingComponentIds"></param>
         /// <param name="downloadPageIdList"></param>
+        /// <param name="renderOnlySelectedPages"></param>
         /// <returns>List of figmaNode IDs to replace</returns>
         public static List<ServerRenderNodeData> FindAllServerRenderNodesInFile(FigmaFile file,
-            List<string> missingComponentIds, List<string> downloadPageIdList)
+            List<string> missingComponentIds, List<string> downloadPageIdList, bool renderOnlySelectedPages)
         {
             var renderSubstitutionNodeList = new List<ServerRenderNodeData>();
+            List<Node> processedNodes = new List<Node>();
+            
             // Process each canvas
             foreach (var page in file.document.children)
             {
                 var isSelectedPage=downloadPageIdList.Contains(page.id);
-                AddRenderSubstitutionsForFigmaNode(page, renderSubstitutionNodeList, 0,missingComponentIds,isSelectedPage,false);
+                if ((renderOnlySelectedPages && isSelectedPage) || !renderOnlySelectedPages)
+                    AddRenderSubstitutionsForFigmaNode(page, renderSubstitutionNodeList, 0,missingComponentIds,isSelectedPage,false);
             }
 
             return renderSubstitutionNodeList;
@@ -323,13 +333,11 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             List<ServerRenderNodeData> substitutionNodeList, int recursiveNodeDepth, List<string> missingComponentIds,
             bool isSelectedPage,bool withinComponentDefinition)
         {
-            if (!isSelectedPage)
-                return;
             // Instances will already be defined by original prefab (eg that may already be rendered). Also dont attempt to render invisible nodes
             if (figmaNode.type == NodeType.INSTANCE && !missingComponentIds.Contains(figmaNode.componentId) || !figmaNode.visible) return;
             
             // Top level frames should be checked for server-side rendering
-            if (withinComponentDefinition && recursiveNodeDepth==1 && figmaNode.exportSettings!=null && figmaNode.exportSettings.Length > 0)
+            if ((isSelectedPage || withinComponentDefinition) && recursiveNodeDepth==1 && figmaNode.exportSettings!=null && figmaNode.exportSettings.Length > 0)
             {
                 Debug.Log($"Found figmaNode with export! Node {figmaNode.name}");
                 substitutionNodeList.Add( new ServerRenderNodeData
@@ -356,7 +364,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             if (figmaNode.type == NodeType.COMPONENT) withinComponentDefinition = true;
             
             foreach (var childNode in figmaNode.children)
-                AddRenderSubstitutionsForFigmaNode(childNode, substitutionNodeList,recursiveNodeDepth+1,missingComponentIds,isSelectedPage,withinComponentDefinition);
+                AddRenderSubstitutionsForFigmaNode(childNode, substitutionNodeList,recursiveNodeDepth+1,missingComponentIds, isSelectedPage, withinComponentDefinition);
             
         }
 
@@ -435,32 +443,21 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         public static List<string> FindMissingComponentDefinitions(FigmaFile file, List<Node> selectedNodes)
         {
             List<string> componentIds = new List<string>();
-            bool found = false;
             foreach (var componentKeyPair in file.components)
             {
                 string componentId = componentKeyPair.Key;
-                var foundNode = GetFigmaNodeWithId(file, componentId);
-               
-                found = false; 
+                Node foundNode = null;
                 foreach (var node in selectedNodes)
                 {
-                    foreach (var child in node.children)
-                    {
-                        if (child.id == componentId)
-                        {    
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (found)
+                    foundNode = GetFigmaNodeWithId(node, componentId);
+                    if (foundNode != null)
                         break;
                 }
-                
-                if ((foundNode == null || !found) && !componentIds.Contains(componentId))
+                if (foundNode == null  && !componentIds.Contains(componentId))
                 {
                     componentIds.Add(componentId);
                 }
+               
             }
             return componentIds;
         }
@@ -603,9 +600,17 @@ namespace UnityFigmaBridge.Editor.FigmaApi
 
             if (File.Exists(prefabBackupPath))
             {
-                GameObject backup = PrefabUtility.LoadPrefabContents(prefabBackupPath);
-                AddMissingObjectToPrefab(backup, instantiatedPrefab);
-                PrefabUtility.UnloadPrefabContents(backup);
+                try
+                {
+                    GameObject backup = PrefabUtility.LoadPrefabContents(prefabBackupPath);
+                    AddMissingObjectToPrefab(backup, instantiatedPrefab);
+                    PrefabUtility.UnloadPrefabContents(backup);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                
             }
 
             // Write prefab with changes

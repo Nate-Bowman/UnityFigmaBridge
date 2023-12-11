@@ -338,15 +338,15 @@ namespace UnityFigmaBridge.Editor
 
             if (settings.UpdateExistingPrefab)
             {
-                //FigmaPaths.DeleteBackup();
+                FigmaPaths.DeleteBackup();
                 // Backup prefabs to apply only the delta to the figma prefab
                 // Improve => To this apply delta between prefabs without having to backup
                 FigmaPaths.BackupPrefabs();
             }
             // Ensure we have all required directories, and remove existing files
             // TODO - Once we move to processing only differences, we won't remove existing files
-            FigmaPaths.CreateRequiredDirectories(settings.BuildOnlySelectedPage);
-
+            FigmaPaths.CreateRequiredDirectories(settings.OnlyImportSelectedPages);
+            
             // Next build a list of all externally referenced components not included in the document (eg
             // from external libraries) and download
             var allExternalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile);
@@ -358,7 +358,7 @@ namespace UnityFigmaBridge.Editor
             
             // Some of the nodes, we'll want to identify to use Figma server side rendering (eg vector shapes, SVGs)
             // First up create a list of nodes we'll substitute with rendered images
-            var serverRenderNodes = FigmaDataUtils.FindAllServerRenderNodesInFile(figmaFile,externalComponentList,downloadPageIdList);
+            var serverRenderNodes = FigmaDataUtils.FindAllServerRenderNodesInFile(figmaFile,externalComponentList,downloadPageIdList, s_UnityFigmaBridgeSettings.OnlyImportSelectedPages);
             
             // Request a render of these nodes on the server if required
             var serverRenderData=new List<FigmaServerRenderData>();
@@ -394,7 +394,7 @@ namespace UnityFigmaBridge.Editor
             FigmaApiUtils.CheckExistingAssetProperties();
             
             // Track fills that are actually used. This is needed as FIGMA has a way of listing any bitmap used rather than active 
-            var foundImageFills = FigmaDataUtils.GetAllImageFillIdsFromFile(figmaFile,downloadPageIdList);
+            var foundImageFills = FigmaDataUtils.GetAllImageFillIdsFromFile(figmaFile,downloadPageIdList, s_UnityFigmaBridgeSettings.OnlyImportSelectedPages);
             
             // Get image fill data for the document (list of urls to download any bitmap data used)
             FigmaImageFillData activeFigmaImageFillData; 
@@ -422,7 +422,7 @@ namespace UnityFigmaBridge.Editor
 
             // Generate font mapping data
             var figmaFontMapTask = FontManager.GenerateFontMapForDocument(figmaFile,
-                s_UnityFigmaBridgeSettings.EnableGoogleFontsDownloads);
+                s_UnityFigmaBridgeSettings.EnableGoogleFontsDownloads, downloadPageNodeList, s_UnityFigmaBridgeSettings.OnlyImportSelectedPages);
             await figmaFontMapTask;
             var fontMap = figmaFontMapTask.Result;
 

@@ -61,12 +61,24 @@ namespace UnityFigmaBridge.Editor.Fonts
         /// </summary>
         /// <param name="figmaFile"></param>
         /// <param name="enableGoogleFontsDownload"></param>
+        /// <param name="downloadPageNodeList"></param>
+        /// <param name="onlyGenerateFontMapForSelectedPages"></param>
         /// <returns></returns>
-        public static async Task<FigmaFontMap> GenerateFontMapForDocument(FigmaFile figmaFile, bool enableGoogleFontsDownload)
+        public static async Task<FigmaFontMap> GenerateFontMapForDocument(FigmaFile figmaFile, bool enableGoogleFontsDownload, List<Node> downloadPageNodeList,bool onlyGenerateFontMapForSelectedPages)
         {
             FigmaFontMap fontMap = new FigmaFontMap();
             var textNodes = new List<Node>();
-            FigmaDataUtils.FindAllNodesOfType(figmaFile.document,NodeType.TEXT, textNodes, 0);
+            if (onlyGenerateFontMapForSelectedPages)
+            {
+                foreach (var page in downloadPageNodeList)
+                {
+                    FigmaDataUtils.FindAllNodesOfType(page,NodeType.TEXT, textNodes, 0);
+                }
+            }
+            else
+            {
+                FigmaDataUtils.FindAllNodesOfType(figmaFile.document,NodeType.TEXT, textNodes, 0);
+            }
             
             var allProjectFontAssets = AssetDatabase.FindAssets($"t:TMP_FontAsset").Select(guid => AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(AssetDatabase.GUIDToAssetPath(guid))).ToList();
 
