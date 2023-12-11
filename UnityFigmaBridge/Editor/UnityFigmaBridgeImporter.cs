@@ -345,7 +345,7 @@ namespace UnityFigmaBridge.Editor
             }
             // Ensure we have all required directories, and remove existing files
             // TODO - Once we move to processing only differences, we won't remove existing files
-            FigmaPaths.CreateRequiredDirectories(settings.UpdateExistingPrefab);
+            FigmaPaths.CreateRequiredDirectories(settings.BuildOnlySelectedPage);
 
             // Next build a list of all externally referenced components not included in the document (eg
             // from external libraries) and download

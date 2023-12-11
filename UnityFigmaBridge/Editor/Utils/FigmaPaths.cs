@@ -167,19 +167,20 @@ namespace UnityFigmaBridge.Editor.Utils
 
         public static void CreateRequiredDirectories(bool updatePrefabs)
         {
+            // The new delta system only applies changes with created prefabs
+            // And as we can chose to only create prefabs from selected pages
+            // We should be deleting previous prefabs to reduce size
+            
             //  Create directory for pages if required 
             if (!Directory.Exists(FigmaPagePrefabFolder))
             {
                 Directory.CreateDirectory(FigmaPagePrefabFolder);
             }
-
-            if (!updatePrefabs)
+            
+            // Remove existing prefabs for pages
+            foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
             {
-                // Remove existing prefabs for pages
-                foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
-                {
-                    file.Delete();
-                }
+                file.Delete();
             }
 
             //  Create directory for flowScreen prefabs if required 
@@ -187,14 +188,11 @@ namespace UnityFigmaBridge.Editor.Utils
             {
                 Directory.CreateDirectory(FigmaScreenPrefabFolder);
             }
-
-            if (!updatePrefabs)
+            
+            // Remove existing flowScreen prefabs
+            foreach (FileInfo file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
             {
-                // Remove existing flowScreen prefabs
-                foreach (FileInfo file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
-                {
-                    file.Delete();
-                }
+                file.Delete();
             }
 
             if (!Directory.Exists(FigmaComponentPrefabFolder))
@@ -202,6 +200,12 @@ namespace UnityFigmaBridge.Editor.Utils
                 Directory.CreateDirectory(FigmaComponentPrefabFolder);
             }
 
+            // Remove existing components prefabs
+            foreach (FileInfo file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles())
+            {
+                file.Delete();
+            }
+            
             //  Create directory for image fills if required 
             if (!Directory.Exists(FigmaImageFillFolder))
             {
