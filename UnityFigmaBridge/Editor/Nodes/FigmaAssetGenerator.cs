@@ -34,7 +34,7 @@ namespace UnityFigmaBridge.Editor.Nodes
             // Cycle through all pages and create
             var createdPages = new List<(Node, GameObject)>();
             List<Node> nodeToProcess = new List<Node>();
-            if (figmaImportProcessData.Settings.BuildOnlySelectedPage)
+            if (figmaImportProcessData.Settings.OnlyImportSelectedPages)
             {
                 nodeToProcess = figmaImportProcessData.SelectedPagesForImport;
             }
@@ -163,7 +163,7 @@ namespace UnityFigmaBridge.Editor.Nodes
                    return nodeGameObject;
                 }
                 // Otherwise we assume we are missing the definition, so just create as normal
-                if (figmaImportProcessData.Settings.BuildOnlySelectedPage && !figmaImportProcessData.ComponentData.AllMissingComponentDefinitionsList.Contains(figmaNode.componentId))
+                if (figmaImportProcessData.Settings.OnlyImportSelectedPages && !figmaImportProcessData.ComponentData.AllMissingComponentDefinitionsList.Contains(figmaNode.componentId))
                 {
                     if (!missingComponentIdBuilt.Contains(figmaNode.componentId))
                     {
