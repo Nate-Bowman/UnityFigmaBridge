@@ -27,12 +27,22 @@ namespace UnityFigmaBridge.Editor.Nodes
         /// <param name="figmaImportProcessData"></param>
         public static void BuildFigmaFile(Canvas rootCanvas, FigmaImportProcessData figmaImportProcessData)
         {
+            missingComponentIdBuilt = new List<string>();
             // Save prefab for each page
             var downloadPageIdList = figmaImportProcessData.SelectedPagesForImport.Select(p => p.id).ToList();
-            
+
             // Cycle through all pages and create
-            var createdPages = new List<(Node,GameObject)>();
-            foreach (var figmaCanvasNode in figmaImportProcessData.SourceFile.document.children)
+            var createdPages = new List<(Node, GameObject)>();
+            List<Node> nodeToProcess = new List<Node>();
+            if (figmaImportProcessData.Settings.BuildOnlySelectedPage)
+            {
+                nodeToProcess = figmaImportProcessData.SelectedPagesForImport;
+            }
+            else
+            {
+                nodeToProcess = figmaImportProcessData.SourceFile.document.children.ToList();
+            }
+            foreach (var figmaCanvasNode in nodeToProcess)
             {
                 bool includedPageObject = downloadPageIdList.Contains(figmaCanvasNode.id);
                 EditorUtility.DisplayProgressBar(UnityFigmaBridgeImporter.PROGRESS_BOX_TITLE, $"Generating Page {figmaCanvasNode.name} ", 0);
@@ -100,6 +110,7 @@ namespace UnityFigmaBridge.Editor.Nodes
             return figmaImportProcessData.Settings.GenerateNodesMarkedForExport || node.exportSettings == null || node.exportSettings.Length == 0;
         }
 
+        static List<string> missingComponentIdBuilt = new List<string>();
 
         /// <summary>
         /// Build an individual Figma Node - this can be of any type, eg FRAME, RECTANGLE, ELLIPSE, TEXT. Frames at depth 0 are treated as screens 
@@ -138,7 +149,8 @@ namespace UnityFigmaBridge.Editor.Nodes
                 var mask=nodeGameObject.AddComponent<Mask>();
                 mask.showMaskGraphic = false;
             }
-            
+            if (figmaNode.type == NodeType.COMPONENT && !missingComponentIdBuilt.Contains(figmaNode.id))
+                missingComponentIdBuilt.Add(figmaNode.id);
             // For component instances, we want to check if there is an existing definition
             // If so, we wont create the full node, but mark it with a "component node marker" component
             // At a later stage, we'll replace with an instantiated prefab and apply properties
@@ -151,6 +163,21 @@ namespace UnityFigmaBridge.Editor.Nodes
                    return nodeGameObject;
                 }
                 // Otherwise we assume we are missing the definition, so just create as normal
+                if (figmaImportProcessData.Settings.BuildOnlySelectedPage && !figmaImportProcessData.ComponentData.AllMissingComponentDefinitionsList.Contains(figmaNode.componentId))
+                {
+                    if (!missingComponentIdBuilt.Contains(figmaNode.componentId))
+                    {
+                        missingComponentIdBuilt.Add(figmaNode.componentId);
+                        figmaNode.type = NodeType.COMPONENT;
+                        figmaNode.id = figmaNode.componentId;
+                    }
+                    else
+                    {
+                        nodeGameObject.AddComponent<FigmaComponentNodeMarker>().Initialise(figmaNode.id, parentFigmaNode.id, figmaNode.componentId);
+                        return nodeGameObject;
+                    }
+                   
+                }
             }
 
             if (figmaNode.type == NodeType.COMPONENT) withinComponentDefinition = true;
