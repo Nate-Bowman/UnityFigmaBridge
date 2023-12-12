@@ -45,7 +45,7 @@ namespace UnityFigmaBridge.Runtime.UI
 
             Debug.Log($"Margins L{SafeAreaLeftMargin},R{SafeAreaRightMargin} - Top {SafeAreaTopMargin}, Bottom {SafeAreaBottomMargin}");
             var rectTransform = transform as RectTransform;
-            rectTransform.sizeDelta=new Vector2(-SafeAreaLeftMargin-SafeAreaRightMargin,-SafeAreaTopMargin-SafeAreaBottomMargin);
+            rectTransform.sizeDelta=new Vector2((float)Screen.width/CanvasScaleFactor-SafeAreaLeftMargin-SafeAreaRightMargin,(float)Screen.height/CanvasScaleFactor-SafeAreaTopMargin-SafeAreaBottomMargin);
             
             // Centered
             rectTransform.anchoredPosition=new Vector2((SafeAreaLeftMargin-SafeAreaRightMargin)*0.5f,-(SafeAreaTopMargin-SafeAreaBottomMargin)*0.5f);
