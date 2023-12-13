@@ -361,7 +361,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                 return;
             }
             
-            if (withinComponentDefinition && GetNodeSubstitutionStatus(figmaNode,recursiveNodeDepth))
+            if ((isSelectedPage || withinComponentDefinition) && GetNodeSubstitutionStatus(figmaNode,recursiveNodeDepth))
             {
                 substitutionNodeList.Add( new ServerRenderNodeData
                 {
