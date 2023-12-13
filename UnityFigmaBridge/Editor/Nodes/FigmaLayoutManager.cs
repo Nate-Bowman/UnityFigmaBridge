@@ -136,13 +136,13 @@ namespace UnityFigmaBridge.Editor.Nodes
                     // Setup alignment according to Figma layout. Primary is Horizontal
                     switch (node.primaryAxisAlignItems)
                     {
-                        // Upper Alignment
+                        // Left Alignment
                         case Node.PrimaryAxisAlignItems.MIN:
                             layoutGroup.childAlignment = node.counterAxisAlignItems switch
                             {
                                 Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
-                                Node.CounterAxisAlignItems.CENTER => TextAnchor.UpperCenter,
-                                Node.CounterAxisAlignItems.MAX => TextAnchor.UpperRight,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleLeft,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.LowerLeft,
                                 _ => layoutGroup.childAlignment
                             };
                             break;
@@ -150,18 +150,18 @@ namespace UnityFigmaBridge.Editor.Nodes
                         case Node.PrimaryAxisAlignItems.CENTER:
                             layoutGroup.childAlignment = node.counterAxisAlignItems switch
                             {
-                                Node.CounterAxisAlignItems.MIN => TextAnchor.MiddleLeft,
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.UpperCenter,
                                 Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
-                                Node.CounterAxisAlignItems.MAX => TextAnchor.MiddleRight,
+                                Node.CounterAxisAlignItems.MAX => TextAnchor.LowerCenter,
                                 _ => layoutGroup.childAlignment
                             };
                             break;
-                        // Lower alignment
+                        // Right alignment
                         case Node.PrimaryAxisAlignItems.MAX:
                             layoutGroup.childAlignment = node.counterAxisAlignItems switch
                             {
-                                Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
-                                Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
+                                Node.CounterAxisAlignItems.MIN => TextAnchor.UpperRight,
+                                Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleRight,
                                 Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
                                 _ => layoutGroup.childAlignment
                             };
