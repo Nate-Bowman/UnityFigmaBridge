@@ -156,14 +156,14 @@ namespace UnityFigmaBridge.Editor.Nodes
             // At a later stage, we'll replace with an instantiated prefab and apply properties
             if (figmaNode.type == NodeType.INSTANCE)
             {
-                if (!figmaImportProcessData.ComponentData.MissingComponentDefinitionsList.Contains(figmaNode.componentId))
+                if (!figmaImportProcessData.ComponentData.MissingComponentDefinitionsListInSelectedPages.Contains(figmaNode.componentId))
                 {
                     // Attach a placeholder transform and component which will get replaced on second pass
                    nodeGameObject.AddComponent<FigmaComponentNodeMarker>().Initialise(figmaNode.id, parentFigmaNode.id, figmaNode.componentId);
                    return nodeGameObject;
                 }
                 // Otherwise we assume we are missing the definition, so just create as normal
-                if (figmaImportProcessData.Settings.OnlyImportSelectedPages && !figmaImportProcessData.ComponentData.AllMissingComponentDefinitionsList.Contains(figmaNode.componentId))
+                if (figmaImportProcessData.Settings.OnlyImportSelectedPages && !figmaImportProcessData.ComponentData.MissingComponentDefinitionsList.Contains(figmaNode.componentId))
                 {
                     if (!missingComponentIdBuilt.Contains(figmaNode.componentId))
                     {

@@ -91,12 +91,12 @@ namespace UnityFigmaBridge.Editor
         /// <summary>
         /// List of all missing component definitions on the selected nodes
         /// </summary>
-        public List<string> MissingComponentDefinitionsList=new();
+        public List<string> MissingComponentDefinitionsListInSelectedPages=new();
         
         /// <summary>
         /// List of all missing component definitions on the whole file
         /// </summary>
-        public List<string> AllMissingComponentDefinitionsList=new();
+        public List<string> MissingComponentDefinitionsList=new();
         
         /// <summary>
         /// Mapping of NodeIDs to components

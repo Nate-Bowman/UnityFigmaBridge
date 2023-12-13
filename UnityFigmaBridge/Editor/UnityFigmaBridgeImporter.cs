@@ -349,8 +349,8 @@ namespace UnityFigmaBridge.Editor
             
             // Next build a list of all externally referenced components not included in the document (eg
             // from external libraries) and download
-            var allExternalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile);
-            var externalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile, downloadPageNodeList);
+            var externalComponentList = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile);
+            var externalComponentListInSelectedPages = FigmaDataUtils.FindMissingComponentDefinitions(figmaFile, downloadPageNodeList);
 
             // For any missing component definitions, we are going to find the first instance and switch it to be
             // The source component. This has to be done early to ensure download of server images
@@ -358,7 +358,7 @@ namespace UnityFigmaBridge.Editor
             
             // Some of the nodes, we'll want to identify to use Figma server side rendering (eg vector shapes, SVGs)
             // First up create a list of nodes we'll substitute with rendered images
-            var serverRenderNodes = FigmaDataUtils.FindAllServerRenderNodesInFile(figmaFile,externalComponentList, allExternalComponentList, downloadPageIdList, s_UnityFigmaBridgeSettings.OnlyImportSelectedPages);
+            var serverRenderNodes = FigmaDataUtils.FindAllServerRenderNodesInFile(figmaFile,externalComponentListInSelectedPages, externalComponentList, downloadPageIdList, s_UnityFigmaBridgeSettings.OnlyImportSelectedPages);
             
             // Request a render of these nodes on the server if required
             var serverRenderData=new List<FigmaServerRenderData>();
@@ -429,8 +429,8 @@ namespace UnityFigmaBridge.Editor
 
             var componentData = new FigmaBridgeComponentData
             { 
-                MissingComponentDefinitionsList = externalComponentList, 
-                AllMissingComponentDefinitionsList = allExternalComponentList
+                MissingComponentDefinitionsListInSelectedPages = externalComponentListInSelectedPages, 
+                MissingComponentDefinitionsList = externalComponentList
             };
             
             // Stores necessary importer data needed for document generator.
