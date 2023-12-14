@@ -43,6 +43,10 @@ namespace UnityFigmaBridge.Editor.PrototypeFlow
                             };
                         }
                     }
+
+                    if (newButtonComponent.targetGraphic == null)
+                        newButtonComponent.transition = Selectable.Transition.None;
+
                 }
             }
 
@@ -60,7 +64,7 @@ namespace UnityFigmaBridge.Editor.PrototypeFlow
         private static bool CheckAddButtonBehaviour(Node node, FigmaImportProcessData figmaImportProcessData)
         {
             // Apply rules
-            if (node.name.ToLower().Contains("button")) return true;
+            if (figmaImportProcessData.Settings.ConsiderObjectNamedButtonAsButtons && node.name.ToLower().Contains("button")) return true;
             if (figmaImportProcessData.Settings.BuildPrototypeFlow && !string.IsNullOrEmpty(node.transitionNodeID))
                 return true;
             return false;

@@ -15,6 +15,8 @@ namespace UnityFigmaBridge.Editor.Settings
         [Tooltip("Generate logic and linking of screens based on FIGMA's 'Prototype' settings")]
         public bool BuildPrototypeFlow=true;
 
+        public bool ConsiderObjectNamedButtonAsButtons = false;
+
         [Space(10)]
         [Tooltip("Scene used for prototype assets, including canvas")]
         public string RunTimeAssetsScenePath;
