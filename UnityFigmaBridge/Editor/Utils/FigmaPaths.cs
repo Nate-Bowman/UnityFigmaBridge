@@ -165,7 +165,7 @@ namespace UnityFigmaBridge.Editor.Utils
             return System.Text.RegularExpressions.Regex.Replace(name, invalidRegStr, "_");
         }
 
-        public static void CreateRequiredDirectories(bool updatePrefabs)
+        public static void CreateRequiredDirectories(bool cleanFolder)
         {
             // The new delta system only applies changes with created prefabs
             // And as we can chose to only create prefabs from selected pages
@@ -191,14 +191,15 @@ namespace UnityFigmaBridge.Editor.Utils
                 Directory.CreateDirectory(FigmaComponentPrefabFolder);
 
             // Remove existing components prefabs
-            foreach (var file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles()) 
-                file.Delete();
+            if (cleanFolder)
+                foreach (var file in new DirectoryInfo(FigmaComponentPrefabFolder).GetFiles()) 
+                    file.Delete();
 
             //  Create directory for image fills if required 
             if (!Directory.Exists(FigmaImageFillFolder)) 
                 Directory.CreateDirectory(FigmaImageFillFolder);
             
-            if (updatePrefabs)
+            if (cleanFolder)
                 foreach (var file in new DirectoryInfo(FigmaImageFillFolder).GetFiles()) 
                     file.Delete();
             
@@ -207,7 +208,7 @@ namespace UnityFigmaBridge.Editor.Utils
                 Directory.CreateDirectory(FigmaServerRenderedImagesFolder);
             
             // Remove existing server rendered images
-            if (updatePrefabs)
+            if (cleanFolder)
                 foreach (var file in new DirectoryInfo(FigmaServerRenderedImagesFolder).GetFiles()) 
                     file.Delete();
             
@@ -215,7 +216,7 @@ namespace UnityFigmaBridge.Editor.Utils
                 Directory.CreateDirectory(FigmaFontMaterialPresetsFolder);
             
             // Remove existing FigmaFontMaterialPresetsFolder
-            if (updatePrefabs)
+            if (cleanFolder)
                 foreach (var file in new DirectoryInfo(FigmaFontMaterialPresetsFolder).GetFiles()) 
                     file.Delete();
             
@@ -223,7 +224,7 @@ namespace UnityFigmaBridge.Editor.Utils
                 Directory.CreateDirectory(FigmaFontsFolder);
             
             // Remove existing fonts
-            if (updatePrefabs)
+            if (cleanFolder)
                 foreach (var file in new DirectoryInfo(FigmaFontsFolder).GetFiles()) 
                     file.Delete();
         }
