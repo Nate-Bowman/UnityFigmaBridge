@@ -75,6 +75,17 @@ namespace UnityFigmaBridge.Editor
             FigmaPaths.BackupPrefabs();
         }
 
+        [MenuItem("Figma Bridge/Clean Figma Folders")]
+        static void Clean()
+        {
+            FigmaPaths.CreateRequiredDirectories(true);
+            if (Directory.Exists(FigmaPaths.FigmaAssetsBackupFolder))
+                Directory.Delete(FigmaPaths.FigmaAssetsBackupFolder, true);
+            Debug.Log("[UnityFigmaBridge] Cleaning done !");
+        }
+        
+
+        
         private static async void SyncAsync()
         {
             var requirementsMet = CheckRequirements();
@@ -345,7 +356,7 @@ namespace UnityFigmaBridge.Editor
             }
             // Ensure we have all required directories, and remove existing files
             // TODO - Once we move to processing only differences, we won't remove existing files
-            FigmaPaths.CreateRequiredDirectories(settings.OnlyImportSelectedPages);
+            FigmaPaths.CreateRequiredDirectories(false);
             
             // Next build a list of all externally referenced components not included in the document (eg
             // from external libraries) and download
