@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityFigmaBridge.Editor.Settings;
 using UnityFigmaBridge.Editor.Utils;
+using Object = UnityEngine.Object;
 
 namespace UnityFigmaBridge.Editor.FigmaApi
 {
@@ -594,20 +596,24 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         {
             GameObject instantiatedPrefab;
             string fileName = Path.GetFileNameWithoutExtension(file.Name);
+            string assetPath;
             string prefabBackupPath;
             if (nodeType == 0)
             {
-                instantiatedPrefab = PrefabUtility.LoadPrefabContents(FigmaPaths.GetPathForPagePrefab(fileName, 0, false));
+                assetPath = FigmaPaths.GetPathForPagePrefab(fileName, 0, false);
+                instantiatedPrefab = PrefabUtility.LoadPrefabContents(assetPath);
                 prefabBackupPath = FigmaPaths.GetPathForPagePrefab(fileName, 0, true);
             }
             else if (nodeType == 1)
             {
-                instantiatedPrefab = PrefabUtility.LoadPrefabContents(FigmaPaths.GetPathForScreenPrefab(fileName, 0, false));
+                assetPath = FigmaPaths.GetPathForScreenPrefab(fileName, 0, false);
+                instantiatedPrefab = PrefabUtility.LoadPrefabContents(assetPath);
                 prefabBackupPath = FigmaPaths.GetPathForScreenPrefab(fileName, 0, true);
             }
             else
             {
-                instantiatedPrefab = PrefabUtility.LoadPrefabContents(FigmaPaths.GetPathForComponentPrefab(fileName, 0, false));
+                assetPath = FigmaPaths.GetPathForComponentPrefab(fileName, 0, false);
+                instantiatedPrefab = PrefabUtility.LoadPrefabContents(assetPath);
                 prefabBackupPath = FigmaPaths.GetPathForComponentPrefab(fileName, 0, true);
             }
 
@@ -617,6 +623,8 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                 {
                     GameObject backup = PrefabUtility.LoadPrefabContents(prefabBackupPath);
                     AddMissingObjectToPrefab(backup, instantiatedPrefab);
+                  
+                    RelinkPrefabs(prefabBackupPath, assetPath);
                     PrefabUtility.UnloadPrefabContents(backup);
                 }
                 catch (Exception e)
@@ -630,7 +638,55 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             PrefabUtility.SaveAsPrefabAsset(instantiatedPrefab, file.FullName);
             PrefabUtility.UnloadPrefabContents(instantiatedPrefab);
         }
+        
+        private static void RelinkPrefabs(string backupPrefabPath, string newPrefabPath)
+        {
+            if (string.IsNullOrEmpty(backupPrefabPath) || string.IsNullOrEmpty(newPrefabPath))
+            {
+                Debug.LogWarning("[RelinkPrefabs] Please enter both paths.");
+                return;
+            }
 
+            Object backup = AssetDatabase.LoadAssetAtPath<Object>(backupPrefabPath);
+            Object newPrefab = AssetDatabase.LoadAssetAtPath<Object>(newPrefabPath);
+            
+            bool couldGetDataBackup = AssetDatabase.TryGetGUIDAndLocalFileIdentifier(backup, out var oldGuid, out long oldFileId);
+            bool couldGetDataNew = AssetDatabase.TryGetGUIDAndLocalFileIdentifier(newPrefab, out var newGuid, out long newFileId);
+
+            if (couldGetDataBackup && couldGetDataNew)
+            {
+                string[] prefabPaths = AssetDatabase.FindAssets("t:Prefab")
+                    .Select(AssetDatabase.GUIDToAssetPath)
+                    .ToArray();
+
+                foreach (string prefabPath in prefabPaths)
+                {
+                    string prefabContents = File.ReadAllText(prefabPath);
+
+                    // Use regular expression to replace GUIDs in the prefab contents
+                    string newPrefabContents = Regex.Replace(prefabContents, oldGuid, newGuid);
+                    if (newPrefabContents != prefabContents)
+                    {
+                        File.WriteAllText(prefabPath, newPrefabContents);
+                        Debug.Log($"GUIDs replaced in prefab: {prefabPath}");
+                    }
+                    else
+                        continue;
+
+                    prefabContents = newPrefabContents;
+                    newPrefabContents = Regex.Replace(prefabContents, oldFileId.ToString(), newFileId.ToString());
+                    if (newPrefabContents != prefabContents)
+                    {
+                        File.WriteAllText(prefabPath, newPrefabContents);
+                        Debug.Log($"FileID replaced in prefab: {prefabPath}");
+                    }
+                }
+
+                AssetDatabase.Refresh();
+            }
+            
+        }
+        
         public static void ApplyDeltaToPrefabs()
         {
             //  Create directory for pages if required 
