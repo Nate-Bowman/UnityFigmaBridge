@@ -524,7 +524,7 @@ namespace UnityFigmaBridge.Editor
                         canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                     }
                     if (settings.UpdateExistingPrefab)
-                        FigmaDataUtils.ApplyDeltaToPrefabs();
+                        FigmaDataUtils.ApplyDeltaToPrefabs(settings.KeepScreenPrefabChildren);
                     var screenInstance =(GameObject)PrefabUtility.InstantiatePrefab(defaultScreenData.FigmaScreenPrefab, figmaBridgeProcessData.PrototypeFlowController.ScreenParentTransform);
                     figmaBridgeProcessData.PrototypeFlowController.SetCurrentScreen(screenInstance,defaultScreenData.FigmaNodeId,true);
                 }

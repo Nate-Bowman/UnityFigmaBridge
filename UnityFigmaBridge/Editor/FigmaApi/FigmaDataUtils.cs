@@ -592,7 +592,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             return false;
         }
 
-        private static void ApplyDeltaToPrefab(FileInfo file, int nodeType)
+        private static void ApplyDeltaToPrefab(FileInfo file, int nodeType, bool isKeepScreenChildren = false)
         {
             GameObject instantiatedPrefab;
             string fileName = Path.GetFileNameWithoutExtension(file.Name);
@@ -622,7 +622,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                 try
                 {
                     GameObject backup = PrefabUtility.LoadPrefabContents(prefabBackupPath);
-                    AddMissingObjectToPrefab(backup, instantiatedPrefab);
+                    AddMissingObjectToPrefab(backup, instantiatedPrefab, isKeepScreenChildren);
                   
                     RelinkPrefabs(prefabBackupPath, assetPath);
                     PrefabUtility.UnloadPrefabContents(backup);
@@ -687,7 +687,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             
         }
         
-        public static void ApplyDeltaToPrefabs()
+        public static void ApplyDeltaToPrefabs(bool isKeepScreenChildren)
         {
             //  Create directory for pages if required 
             if (Directory.Exists(FigmaPaths.FigmaPagePrefabBackupFolder))
@@ -714,7 +714,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                     foreach (var file in new DirectoryInfo(FigmaPaths.FigmaScreenPrefabFolder).GetFiles())
                     {
                         if (file.Extension != ".meta")
-                            ApplyDeltaToPrefab(file, 1);
+                            ApplyDeltaToPrefab(file, 1, isKeepScreenChildren);
                     }
                 }
             }
@@ -784,10 +784,19 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             }
         }
 
-        public static void AddMissingObjectToPrefab(GameObject originalPrefab, GameObject newPrefab)
+        public static void AddMissingObjectToPrefab(GameObject originalPrefab, GameObject newPrefab, bool isKeepScreenChildren)
         {
             // Iterate through all components of the new GameObject
             AddMissingComponentToPrefab(originalPrefab, newPrefab);
+            
+            if (isKeepScreenChildren)
+            {
+                var originalPrefabObject = GameObject.Instantiate(originalPrefab);
+                Dictionary<string, Transform> newObjectChildrenMap = new Dictionary<string, Transform>();
+                GetAllChildrenMap(newPrefab.transform, ref newObjectChildrenMap);
+                GetAllMissingChildrenMove(originalPrefabObject.transform, newObjectChildrenMap);
+                GameObject.DestroyImmediate(originalPrefabObject);
+            }
 
             GameObject originalChild;
             GameObject newChild;
@@ -826,6 +835,37 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                 }
             }
 
+        }
+        
+        private static void GetAllChildrenMap(Transform parentTransform, ref Dictionary<string, Transform> childMap)
+        {
+            for (int i = 0; i < parentTransform.childCount; i++)
+            {
+                Transform childTransform = parentTransform.GetChild(i);
+                childMap[childTransform.name] = childTransform;
+                GetAllChildrenMap(childTransform, ref childMap);
+            }
+        }
+        
+        private static void GetAllMissingChildrenMove(Transform parentTransform, Dictionary<string, Transform> newObjectMap)
+        {
+            for (int i = parentTransform.childCount - 1; i >= 0; i--)
+            {
+                Transform childTransform = parentTransform.GetChild(i);
+
+                if (newObjectMap.ContainsKey(childTransform.name))
+                {
+                    GetAllMissingChildrenMove(childTransform, newObjectMap);
+                }
+                else
+                {
+                    string parentName = childTransform.parent.name;
+                    if (newObjectMap.ContainsKey(parentName))
+                    {
+                        childTransform.parent = newObjectMap[parentName];
+                    }
+                }
+            }
         }
     }
 }

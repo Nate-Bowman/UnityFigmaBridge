@@ -71,6 +71,9 @@ namespace UnityFigmaBridge.Editor.Settings
 
         [Tooltip("If true, update existing screens prefabs")]
         public bool UpdateExistingPrefab = false;
+        
+        [Tooltip("If true, keep all child objects in screens prefabs")]
+        public bool KeepScreenPrefabChildren = false;
 
         [Tooltip("If true the pivot and the anchor will be the same as the one set in Figma")]
         public bool MergeAnchorAndPivot = true;
