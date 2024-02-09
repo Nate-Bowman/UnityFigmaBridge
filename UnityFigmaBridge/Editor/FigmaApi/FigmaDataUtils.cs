@@ -791,50 +791,55 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             
             if (isKeepScreenChildren)
             {
-                var originalPrefabObject = GameObject.Instantiate(originalPrefab);
                 Dictionary<string, Transform> newObjectChildrenMap = new Dictionary<string, Transform>();
                 GetAllChildrenMap(newPrefab.transform, ref newObjectChildrenMap);
-                GetAllMissingChildrenMove(originalPrefabObject.transform, newObjectChildrenMap);
-                GameObject.DestroyImmediate(originalPrefabObject);
+                GetAllMissingChildrenCreate(originalPrefab.transform, newObjectChildrenMap);
             }
-
-            GameObject originalChild;
-            GameObject newChild;
-            bool hasChild = false;
-            for (int i = 0; i < originalPrefab.transform.childCount; i++)
+            else
             {
-                originalChild = originalPrefab.transform.GetChild(i).gameObject;
-                for (int j = 0; j < newPrefab.transform.childCount; j++)
+                GameObject originalChild;
+                GameObject newChild;
+                bool hasChild = false;
+                for (int i = 0; i < originalPrefab.transform.childCount; i++)
                 {
-                    newChild = newPrefab.transform.GetChild(j).gameObject;
-                    if (originalChild.name == newChild.name)
+                    originalChild = originalPrefab.transform.GetChild(i).gameObject;
+                    for (int j = 0; j < newPrefab.transform.childCount; j++)
                     {
-                        hasChild = true;
-                        AddMissingComponentToPrefab(originalChild, newChild);
-                        break;
-                    }
-                    hasChild = false;
-                }
+                        newChild = newPrefab.transform.GetChild(j).gameObject;
+                        if (originalChild.name == newChild.name)
+                        {
+                            hasChild = true;
+                            AddMissingComponentToPrefab(originalChild, newChild);
+                            break;
+                        }
 
-                if (!hasChild)
-                {
-                    var originalChildPrefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(originalChild);
-                    GameObject originalChildPrefab = string.IsNullOrEmpty(originalChildPrefabPath) ? null : (GameObject)AssetDatabase.LoadMainAssetAtPath(originalChildPrefabPath);
-                    if (originalChildPrefab == null)
-                    {
-                        newChild = GameObject.Instantiate(originalChild, newPrefab.transform);
-                        newChild.name = originalChild.name;
-                        newChild.transform.SetSiblingIndex(i);
+                        hasChild = false;
                     }
-                    else
+
+                    if (!hasChild)
                     {
-                        GameObject originalChildPrefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(originalChildPrefab, newPrefab.transform);
-                        originalChildPrefabInstance.transform.SetSiblingIndex(i);
-                        PrefabUtility.RecordPrefabInstancePropertyModifications(originalChildPrefabInstance);
+                        CreateNewChildObject(originalChild, newPrefab.transform, i);
                     }
                 }
             }
-
+        }
+        
+        private static void CreateNewChildObject(GameObject originalChild, Transform newObjectParent, int i)
+        {
+            var originalChildPrefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(originalChild);
+            GameObject originalChildPrefab = string.IsNullOrEmpty(originalChildPrefabPath) ? null : (GameObject)AssetDatabase.LoadMainAssetAtPath(originalChildPrefabPath);
+            if (originalChildPrefab == null)
+            {
+                var newChild = GameObject.Instantiate(originalChild, newObjectParent);
+                newChild.name = originalChild.name;
+                newChild.transform.SetSiblingIndex(i);
+            }
+            else
+            {
+                GameObject originalChildPrefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(originalChildPrefab, newObjectParent);
+                originalChildPrefabInstance.transform.SetSiblingIndex(i);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(originalChildPrefabInstance);
+            }
         }
         
         private static void GetAllChildrenMap(Transform parentTransform, ref Dictionary<string, Transform> childMap)
@@ -847,25 +852,27 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             }
         }
         
-        private static void GetAllMissingChildrenMove(Transform parentTransform, Dictionary<string, Transform> newObjectMap)
+        private static void GetAllMissingChildrenCreate(Transform parentTransform, Dictionary<string, Transform> newObjectMap)
         {
-            for (int i = parentTransform.childCount - 1; i >= 0; i--)
+            for (int i = 0; i < parentTransform.transform.childCount; i++)
             {
                 Transform childTransform = parentTransform.GetChild(i);
-
                 if (newObjectMap.ContainsKey(childTransform.name))
                 {
-                    GetAllMissingChildrenMove(childTransform, newObjectMap);
+                    if (newObjectMap[childTransform.name].parent.name == childTransform.parent.name)
+                        AddMissingComponentToPrefab(childTransform.gameObject, newObjectMap[childTransform.name].gameObject);
+                    GetAllMissingChildrenCreate(childTransform, newObjectMap);
                 }
                 else
                 {
                     string parentName = childTransform.parent.name;
                     if (newObjectMap.ContainsKey(parentName))
                     {
-                        childTransform.parent = newObjectMap[parentName];
+                        CreateNewChildObject(childTransform.gameObject, newObjectMap[parentName], i);
                     }
                 }
             }
         }
+        
     }
 }
