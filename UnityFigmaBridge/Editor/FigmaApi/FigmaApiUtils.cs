@@ -30,6 +30,8 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         public Node SourceNode;
     }
     
+   
+    
     public static class FigmaApiUtils
     {
         private static string WRITE_FILE_PATH = "FigmaOutput.json";
@@ -50,7 +52,27 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             public string FilePath;
         }
         
-        
+        /// <summary>
+        /// This is a custom Converter to prevent Figma badly parsed value to block the process 
+        /// </summary>
+        public class NullableFloatConverter : JsonConverter<float?>
+        {
+            public override float? ReadJson(JsonReader reader, Type objectType, float? existingValue, bool hasExistingValue, JsonSerializer serializer)
+            {
+                if (reader.TokenType == JsonToken.Null)
+                    return null;
+                else
+                    return Convert.ToSingle(reader.Value);
+            }
+
+            public override void WriteJson(JsonWriter writer, float? value, JsonSerializer serializer)
+            {
+                if (value.HasValue)
+                    writer.WriteValue(value.Value);
+                else
+                    writer.WriteNull();
+            }
+        }
 
 
         /// <summary>
@@ -102,6 +124,7 @@ namespace UnityFigmaBridge.Editor.FigmaApi
                     DefaultValueHandling = DefaultValueHandling.Include,
                     MissingMemberHandling = MissingMemberHandling.Ignore,
                     NullValueHandling = NullValueHandling.Ignore,
+                    Converters = { new NullableFloatConverter() } // Add the custom converter
                 };
                 
                 // Deserialize the document

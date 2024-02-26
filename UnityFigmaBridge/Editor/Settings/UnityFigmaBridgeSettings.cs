@@ -169,8 +169,8 @@ namespace UnityFigmaBridge.Editor.Settings
     [Serializable]
     public class FigmaSectionData
     {
-        public string Name;
-        public string NodeId;
+        public readonly string Name;
+        public readonly string NodeId;
         public bool Selected;
         
         public FigmaSectionData(){}
@@ -189,6 +189,17 @@ namespace UnityFigmaBridge.Editor.Settings
             if (obj is FigmaSectionData d)
                 return NodeId == d.NodeId;
             return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked // Overflow is fine, just wrap
+            {
+                int hash = 17;
+                hash = hash * 23 + Name.GetHashCode();
+                hash = hash * 23 + NodeId.GetHashCode();
+                return hash;
+            }
         }
     }
 }
