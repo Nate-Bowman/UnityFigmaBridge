@@ -550,7 +550,14 @@ namespace UnityFigmaBridge.Editor.FigmaApi
             }
             return pageNodes;
         }
-
+        
+        public static List<Node> GetSectionNodes(Node pageNode)
+        {
+            var sectionNodes = pageNode.children.Where(p => p.type == NodeType.SECTION).ToList();
+            return sectionNodes;
+        }
+        
+        
         private static void SearchScreenNodes(Node node, Node parentNode, List<Node> screenNodes)
         {
             if (IsScreenNode(node,parentNode))

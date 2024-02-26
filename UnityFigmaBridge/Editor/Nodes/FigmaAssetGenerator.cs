@@ -97,8 +97,7 @@ namespace UnityFigmaBridge.Editor.Nodes
             // Generate all child nodes. 
             foreach (var childNode in pageNode.children)
             {
-               
-                if (CheckNodeValidForGeneration(childNode,figmaImportProcessData))
+                if (CheckNodeValidForGeneration(childNode,figmaImportProcessData) && CheckIfSectionNodeIsInSelectedSections(childNode, figmaImportProcessData))
                     BuildFigmaNode(childNode, pageTransform, pageNode, 0, figmaImportProcessData, includedPageObject, false );
             }
 
@@ -110,6 +109,29 @@ namespace UnityFigmaBridge.Editor.Nodes
             return figmaImportProcessData.Settings.GenerateNodesMarkedForExport || node.exportSettings == null || node.exportSettings.Length == 0;
         }
 
+        /// <summary>
+        /// Check if the SECTION NODE is selected or not. If it's not a SECTION returns true 
+        /// </summary>
+        /// <param name="figmaNode">The source figma node</param>
+        /// <param name="figmaImportProcessData"></param>
+        /// <returns></returns>
+        private static bool CheckIfSectionNodeIsInSelectedSections(Node figmaNode, FigmaImportProcessData figmaImportProcessData)
+        {
+            if (!figmaImportProcessData.Settings.OnlyImportSelectedPages || figmaNode.type != NodeType.SECTION)
+                return true;
+            
+            var a = figmaImportProcessData.Settings.PageDataList;
+            foreach (var page in a)
+            {
+                if (!page.Selected)
+                    continue;
+                var b = page.Sections.Where(x => x.NodeId == figmaNode.id && x.Selected);
+                if (b.Any())
+                    return true;
+            }
+            return false;
+        }
+        
         static List<string> missingComponentIdBuilt = new List<string>();
 
         /// <summary>

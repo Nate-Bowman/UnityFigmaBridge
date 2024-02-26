@@ -147,7 +147,21 @@ namespace UnityFigmaBridge.Editor.Settings
                         if (isChecked != data.Selected) {
                             applyChanges = true;
                         }
-                        
+
+                        if (data.Selected)
+                        {
+                            EditorGUI.indentLevel++;
+
+                            foreach (var section in data.Sections)
+                            {
+                                isChecked = section.Selected;
+                                section.Selected = EditorGUILayout.ToggleLeft(section.Name, section.Selected);
+                                if (isChecked != section.Selected)
+                                    applyChanges = true;
+                            }
+
+                            EditorGUI.indentLevel--;
+                        }
                     }
                     scrollPos = scrollViewScope.scrollPosition;
                 }

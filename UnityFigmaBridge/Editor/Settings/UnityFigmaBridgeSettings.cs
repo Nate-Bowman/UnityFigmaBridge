@@ -129,6 +129,20 @@ namespace UnityFigmaBridge.Editor.Settings
                 PageDataList.RemoveAt(index);
             }
             PageDataList.OrderBy(p => p.NodeId);
+
+            foreach (var pageData in PageDataList)
+            {
+                pageData.Sections ??= new List<FigmaSectionData>();
+                var pageNode = pageNodeList.FirstOrDefault(p => p.id == pageData.NodeId);
+                var missingPageSectionList = FigmaDataUtils.GetSectionNodes(pageNode);
+                foreach (var section in missingPageSectionList)
+                {
+                    var figmaSectionData = new FigmaSectionData(section.name, section.id);
+                    if (!pageData.Sections.Contains(figmaSectionData))
+                        pageData.Sections.Add(figmaSectionData);
+                }
+            }
+            
         }
     }
 
@@ -139,6 +153,8 @@ namespace UnityFigmaBridge.Editor.Settings
         public string NodeId;
         public bool Selected;
 
+        public List<FigmaSectionData> Sections;
+        
         public FigmaPageData(){}
 
         public FigmaPageData(string name, string nodeId)
@@ -146,7 +162,33 @@ namespace UnityFigmaBridge.Editor.Settings
             Name = name;
             NodeId = nodeId;
             Selected = true; // default is true
+            Sections = new List<FigmaSectionData>();
         }
     }
     
+    [Serializable]
+    public class FigmaSectionData
+    {
+        public string Name;
+        public string NodeId;
+        public bool Selected;
+        
+        public FigmaSectionData(){}
+
+        public FigmaSectionData(string name, string nodeId)
+        {
+            Name = name;
+            NodeId = nodeId;
+            Selected = true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is string s)
+                return NodeId == s;
+            if (obj is FigmaSectionData d)
+                return NodeId == d.NodeId;
+            return base.Equals(obj);
+        }
+    }
 }
